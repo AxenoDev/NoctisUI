@@ -30,8 +30,8 @@ jobs:
         run: |
           VERSION=$(echo ${{ github.event.milestone.title }} | tr "." "_")
           ./gradlew build remapJar
-          cp ./builds/noctisui.jar ./builds/noctisui-$VERSION.jar
-          rm -f ./builds/noctisui.jar
+          FINAL_JAR=$(ls build/libs/*[0-9].jar | head -n 1)
+          cp "$FINAL_JAR" "builds/noctisui-$VERSION.jar"
         env:
           TAG: ${{ github.event.milestone.title }}
 
