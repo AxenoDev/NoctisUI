@@ -67,14 +67,12 @@ public class TextInput implements UIComponent, QuickImports {
     private boolean showTooltip = false;
     private long tooltipShowTime = 0;
     private final float ANIMATION_SPEED = 0.08f;
-    private final float TOOLTIP_DELAY = 1000; // ms
+    private final float TOOLTIP_DELAY = 1000;
 
-    // Icon hover states
     private float passwordIconHover = 0.0f;
     private float searchIconHover = 0.0f;
     private float chevronUpHover = 0.0f;
     private float chevronDownHover = 0.0f;
-
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
@@ -416,7 +414,6 @@ public class TextInput implements UIComponent, QuickImports {
         float iconX = x + width - padding - eyeIconSize;
         float iconY = y + (height - eyeIconSize) / 2;
 
-        // Couleur animée pour l'icône password
         Color currentIconColor = interpolateColor(iconColor, iconHoverColor, passwordIconHover);
 
         if (passwordVisible) {
@@ -430,7 +427,6 @@ public class TextInput implements UIComponent, QuickImports {
         float iconX = x + width - padding - eyeIconSize;
         float iconY = y + (height - eyeIconSize) / 2;
 
-        // Couleur animée pour l'icône search
         Color currentIconColor = interpolateColor(iconColor, iconHoverColor, searchIconHover);
 
         lucideIcon.render(
@@ -445,7 +441,6 @@ public class TextInput implements UIComponent, QuickImports {
         float iconYUp = y + (height - iconSize) / 2 - iconSize / 2;
         float iconYDown = y + (height - iconSize) / 2 + iconSize / 2;
 
-        // Couleurs animées pour les chevrons
         Color upColor = interpolateColor(iconColor, iconHoverColor, chevronUpHover);
         Color downColor = interpolateColor(iconColor, iconHoverColor, chevronDownHover);
 
