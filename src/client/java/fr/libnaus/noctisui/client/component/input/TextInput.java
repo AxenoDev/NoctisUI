@@ -58,6 +58,10 @@ public class TextInput implements UIComponent, QuickImports {
 
     @Getter
     private int maxLength = Integer.MAX_VALUE;
+    @Setter
+    private int maxIntInput = Integer.MAX_VALUE;
+    @Setter
+    private int minIntInput = 0;
 
     private float focusAnimationProgress = 0.0f;
     private float hoverAnimationProgress = 0.0f;
@@ -546,6 +550,8 @@ public class TextInput implements UIComponent, QuickImports {
         try {
             double value = text.isEmpty() ? 0 : Double.parseDouble(text);
             value += delta;
+            if (value <= minIntInput) value = minIntInput;
+            if (value >= maxIntInput) value = maxIntInput;
             text = String.valueOf((value % 1 == 0) ? (int) value : value);
             setCursorPosition(text.length());
         } catch (NumberFormatException e) {
@@ -714,6 +720,18 @@ public class TextInput implements UIComponent, QuickImports {
     private void insertText(String str) {
         if (hasSelection()) {
             deleteSelection();
+        }
+
+        if (inputType.equals(InputType.NUMBER)) {
+            try {
+                double value = text.isEmpty() ? 0 : Double.parseDouble(text);
+                double newValue = Double.parseDouble(str);
+                if (newValue <= maxIntInput) text = String.valueOf(maxIntInput);
+                if (newValue >= minIntInput) text = String.valueOf(minIntInput);
+                moveCursor(text.length());
+            } catch (NumberFormatException e) {
+                return;
+            }
         }
 
         if (text.length() + str.length() <= maxLength) {
