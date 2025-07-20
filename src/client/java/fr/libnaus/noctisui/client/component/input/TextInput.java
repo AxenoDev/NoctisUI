@@ -58,6 +58,25 @@ public class TextInput implements UIComponent, QuickImports {
 
     @Getter
     private int maxLength = Integer.MAX_VALUE;
+    @Setter
+    private int maxIntInput = Integer.MAX_VALUE;
+    @Setter
+    private int minIntInput = 0;
+
+    private float focusAnimationProgress = 0.0f;
+    private float hoverAnimationProgress = 0.0f;
+    private float validationAnimationProgress = 0.0f;
+    private float tooltipAnimationProgress = 0.0f;
+    private boolean isHovering = false;
+    private boolean showTooltip = false;
+    private long tooltipShowTime = 0;
+    private final float ANIMATION_SPEED = 0.08f;
+    private final float TOOLTIP_DELAY = 1000;
+
+    private float passwordIconHover = 0.0f;
+    private float searchIconHover = 0.0f;
+    private float chevronUpHover = 0.0f;
+    private float chevronDownHover = 0.0f;
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
@@ -95,6 +114,12 @@ public class TextInput implements UIComponent, QuickImports {
     private Color validBorderColor = new Color(100, 255, 100, 255);
     @Setter
     private Color invalidBorderColor = new Color(255, 100, 100, 255);
+    @Setter
+    private Color tooltipBackgroundColor = new Color(60, 60, 60, 240);
+    @Setter
+    private Color tooltipBorderColor = new Color(255, 100, 100, 255);
+    @Setter
+    private Color tooltipTextColor = new Color(255, 255, 255, 255);
 
     @Setter
     private float borderRadius = 4.0f;
@@ -159,14 +184,16 @@ public class TextInput implements UIComponent, QuickImports {
     public void render(MatrixStack matrices, double mouseX, double mouseY, float delta) {
         if (!visible) return;
 
+        updateAnimations(mouseX, mouseY, delta);
         updateCursorBlink();
 
         Color bColor = getBorderColor();
-
         Color bgColor = focused ? focusedBackgroundColor : backgroundColor;
+
         Render2DEngine.drawRoundedRect(matrices, x, y, width, height, borderRadius, bgColor);
 
-        Render2DEngine.drawRoundedOutline(matrices, x, y, width, height, borderRadius, borderWidth, bColor);
+        float validationBorderWidth = borderWidth + (validationAnimationProgress * 1.0f);
+        Render2DEngine.drawRoundedOutline(matrices, x, y, width, height, borderRadius, validationBorderWidth, bColor);
 
         float rightPadding = getRightPadding();
         float textX = x + padding - scrollOffset;
@@ -184,14 +211,82 @@ public class TextInput implements UIComponent, QuickImports {
                    placeholderColor.getRGB() | (placeholderColor.getAlpha() << 24));
        else if (!displayText.isEmpty())
               fontAtlas.render(matrices, displayText, textX, textY, fontSize,
-                     textColor.getRGB() | (textColor.getAlpha() << 24));
+                      textColor.getRGB() | (textColor.getAlpha() << 24));
 
-        if (focused && cursorVisible && enabled)
-            renderCursor(matrices, textX, textY);
+       if (focused && cursorVisible && enabled)
+           renderCursor(matrices, textX, textY);
 
-        disableScissor();
+       disableScissor();
 
-        renderTypeSpecificIcons(matrices, mouseX, mouseY);
+       renderTypeSpecificIcons(matrices, mouseX, mouseY);
+
+       if (showValidation && !isValid() && tooltipAnimationProgress > 0.0f)
+           renderValidationTooltip(matrices);
+    }
+
+    private void updateAnimations(double mouseX, double mouseY, float delta) {
+        boolean wasHovering = isHovering;
+        isHovering = isPointInBounds(mouseX, mouseY);
+
+        float focusTarget = focused ? 1.0f : 0.0f;
+        focusAnimationProgress = lerp(focusAnimationProgress, focusTarget, ANIMATION_SPEED);
+
+        float hoverTarget = isHovering ? 1.0f : 0.0f;
+        hoverAnimationProgress = lerp(hoverAnimationProgress, hoverTarget, ANIMATION_SPEED * 1.5f);
+
+        float validationTarget = (showValidation && !isValid() && !text.isEmpty()) ? 1.0f : 0.0f;
+        validationAnimationProgress = lerp(validationAnimationProgress, validationTarget, ANIMATION_SPEED * 2.0f);
+
+        if (showValidation && !isValid() && !text.isEmpty()) {
+            if (!showTooltip) {
+                tooltipShowTime = System.currentTimeMillis();
+                showTooltip = true;
+            }
+
+            if (System.currentTimeMillis() - tooltipShowTime > TOOLTIP_DELAY) {
+                tooltipAnimationProgress = lerp(tooltipAnimationProgress, 1.0f, ANIMATION_SPEED * 2.0f);
+            }
+        } else {
+            showTooltip = false;
+            tooltipAnimationProgress = lerp(tooltipAnimationProgress, 0.0f, ANIMATION_SPEED * 3.0f);
+        }
+
+        updateIconHoverAnimations(mouseX, mouseY);
+    }
+
+    private void updateIconHoverAnimations(double mouseX, double mouseY) {
+        switch (inputType) {
+            case PASSWORD:
+                float iconX = x + width - padding - eyeIconSize;
+                float iconY = y + (height - eyeIconSize) / 2;
+                boolean hoveringPassword = mouseX >= iconX && mouseX <= iconX + eyeIconSize &&
+                        mouseY >= iconY && mouseY <= iconY + eyeIconSize;
+                passwordIconHover = lerp(passwordIconHover, hoveringPassword ? 1.0f : 0.0f, ANIMATION_SPEED * 2.0f);
+                break;
+
+            case SEARCH:
+                iconX = x + width - padding - eyeIconSize;
+                iconY = y + (height - eyeIconSize) / 2;
+                boolean hoveringSearch = mouseX >= iconX && mouseX <= iconX + eyeIconSize &&
+                        mouseY >= iconY && mouseY <= iconY + eyeIconSize;
+                searchIconHover = lerp(searchIconHover, hoveringSearch ? 1.0f : 0.0f, ANIMATION_SPEED * 2.0f);
+                break;
+
+            case NUMBER:
+                float iconSize = 12.0f;
+                iconX = x + width - padding - iconSize;
+                float iconYUp = y + (height - iconSize) / 2 - iconSize / 2;
+                float iconYDown = y + (height - iconSize) / 2 + iconSize / 2;
+
+                boolean hoverUp = mouseX >= iconX && mouseX <= iconX + iconSize &&
+                        mouseY >= iconYUp && mouseY <= iconYUp + iconSize;
+                boolean hoverDown = mouseX >= iconX && mouseX <= iconX + iconSize &&
+                        mouseY >= iconYDown && mouseY <= iconYDown + iconSize;
+
+                chevronUpHover = lerp(chevronUpHover, hoverUp ? 1.0f : 0.0f, ANIMATION_SPEED * 2.0f);
+                chevronDownHover = lerp(chevronDownHover, hoverDown ? 1.0f : 0.0f, ANIMATION_SPEED * 2.0f);
+                break;
+        }
     }
 
     private String getDisplayText() {
@@ -217,6 +312,94 @@ public class TextInput implements UIComponent, QuickImports {
         };
     }
 
+    private float lerp(float start, float end, float factor) {
+        return start + (end - start) * Math.min(factor, 1.0f);
+    }
+
+    private void renderValidationTooltip(MatrixStack matrices) {
+        String errorMessage = getValidationErrorMessage();
+        if (errorMessage.isEmpty()) return;
+
+        float tooltipWidth = fontAtlas.getWidth(errorMessage, fontSize - 1.0f) + 16.0f;
+        float tooltipHeight = fontAtlas.getLineHeight(fontSize - 1.0f) + 8.0f;
+        float tooltipX = x + width + 8.0f;
+        float tooltipY = y + (height - tooltipHeight) / 2;
+
+        float scale = tooltipAnimationProgress;
+        float scaledWidth = tooltipWidth * scale;
+        float scaledHeight = tooltipHeight * scale;
+        float scaledX = tooltipX + (tooltipWidth - scaledWidth) / 2;
+        float scaledY = tooltipY + (tooltipHeight - scaledHeight) / 2;
+
+        if (scale > 0.1f) {
+            Color bgColor = new Color(
+                    tooltipBackgroundColor.getRed(),
+                    tooltipBackgroundColor.getGreen(),
+                    tooltipBackgroundColor.getBlue(),
+                    (int) (tooltipBackgroundColor.getAlpha() * scale)
+            );
+
+            Render2DEngine.drawRoundedRect(matrices, scaledX, scaledY, scaledWidth, scaledHeight, 4.0f, bgColor);
+
+            Color borderColor = new Color(
+                    tooltipBorderColor.getRed(),
+                    tooltipBorderColor.getGreen(),
+                    tooltipBorderColor.getBlue(),
+                    (int)(tooltipBorderColor.getAlpha() * scale)
+            );
+
+            Render2DEngine.drawRoundedOutline(matrices, scaledX, scaledY, scaledWidth, scaledHeight, 4.0f, 1.0f, borderColor);
+
+            if (scale > 0.5f) {
+                Color textColor = new Color(
+                        tooltipTextColor.getRed(),
+                        tooltipTextColor.getGreen(),
+                        tooltipTextColor.getBlue(),
+                        (int)(tooltipTextColor.getAlpha() * scale)
+                );
+
+                fontAtlas.render(
+                        matrices, errorMessage,
+                        scaledX + 8.0f * scale,
+                        scaledY + 4.0f * scale,
+                        (fontSize - 1.0f) * scale,
+                        textColor.getRGB() | (textColor.getAlpha() << 24)
+                );
+            }
+        }
+
+    }
+
+    private String getValidationErrorMessage() {
+        if (text.isEmpty()) return "";
+
+        return switch (inputType) {
+            case EMAIL -> {
+                if (!EMAIL_PATTERN.matcher(text).matches()) {
+                    yield "Adresse email invalide";
+                }
+                yield "";
+            }
+            case URL -> {
+                if (!URL_PATTERN.matcher(text).matches()) {
+                    if (!text.startsWith("http")) {
+                        yield "URL doit commencer par http:// ou https://";
+                    } else {
+                        yield "Format URL invalide";
+                    }
+                }
+                yield "";
+            }
+            case NUMBER -> {
+                if (!NUMBER_PATTERN.matcher(text).matches() || text.equals("-") || text.equals(".")) {
+                    yield "Nombre invalide";
+                }
+                yield "";
+            }
+            default -> "";
+        };
+    }
+
     private void renderTypeSpecificIcons(MatrixStack matrices, double mouseX, double mouseY) {
         switch (inputType) {
             case NUMBER:
@@ -235,10 +418,7 @@ public class TextInput implements UIComponent, QuickImports {
         float iconX = x + width - padding - eyeIconSize;
         float iconY = y + (height - eyeIconSize) / 2;
 
-        boolean isHovering = mouseX >= iconX && mouseX <= iconX + eyeIconSize &&
-                mouseY >= iconY && mouseY <= iconY + eyeIconSize;
-
-        Color currentIconColor = isHovering ? iconHoverColor : iconColor;
+        Color currentIconColor = interpolateColor(iconColor, iconHoverColor, passwordIconHover);
 
         if (passwordVisible) {
             renderEyeOpenIcon(matrices, iconX, iconY, currentIconColor);
@@ -251,12 +431,11 @@ public class TextInput implements UIComponent, QuickImports {
         float iconX = x + width - padding - eyeIconSize;
         float iconY = y + (height - eyeIconSize) / 2;
 
+        Color currentIconColor = interpolateColor(iconColor, iconHoverColor, searchIconHover);
+
         lucideIcon.render(
                 matrices, searchIcon, iconX, iconY, eyeIconSize,
-                (mouseX >= iconX && mouseX <= iconX + eyeIconSize &&
-                        mouseY >= iconY && mouseY <= iconY + eyeIconSize) ?
-                        iconHoverColor.getRGB() | (iconHoverColor.getAlpha() << 24) :
-                        iconColor.getRGB() | (iconColor.getAlpha() << 24)
+                currentIconColor.getRGB() | (currentIconColor.getAlpha() << 24)
         );
     }
 
@@ -266,17 +445,13 @@ public class TextInput implements UIComponent, QuickImports {
         float iconYUp = y + (height - iconSize) / 2 - iconSize / 2;
         float iconYDown = y + (height - iconSize) / 2 + iconSize / 2;
 
-        boolean hoverUp = mouseX >= iconX && mouseX <= iconX + iconSize &&
-                mouseY >= iconYUp && mouseY <= iconYUp + iconSize;
-        boolean hoverDown = mouseX >= iconX && mouseX <= iconX + iconSize &&
-                mouseY >= iconYDown && mouseY <= iconYDown + iconSize;
+        Color upColor = interpolateColor(iconColor, iconHoverColor, chevronUpHover);
+        Color downColor = interpolateColor(iconColor, iconHoverColor, chevronDownHover);
 
         lucideIcon.render(matrices, chevronUpIcon, iconX, iconYUp, iconSize,
-                hoverUp ? iconHoverColor.getRGB() | (iconHoverColor.getAlpha() << 24)
-                        : iconColor.getRGB() | (iconColor.getAlpha() << 24));
+                upColor.getRGB() | (upColor.getAlpha() << 24));
         lucideIcon.render(matrices, chevronDownIcon, iconX, iconYDown, iconSize,
-                hoverDown ? iconHoverColor.getRGB() | (iconHoverColor.getAlpha() << 24)
-                        : iconColor.getRGB() | (iconColor.getAlpha() << 24));
+                downColor.getRGB() | (downColor.getAlpha() << 24));
     }
 
     private void renderEyeOpenIcon(MatrixStack matrices, float x, float y, Color color) {
@@ -375,6 +550,8 @@ public class TextInput implements UIComponent, QuickImports {
         try {
             double value = text.isEmpty() ? 0 : Double.parseDouble(text);
             value += delta;
+            if (value <= minIntInput) value = minIntInput;
+            if (value >= maxIntInput) value = maxIntInput;
             text = String.valueOf((value % 1 == 0) ? (int) value : value);
             setCursorPosition(text.length());
         } catch (NumberFormatException e) {
@@ -545,6 +722,18 @@ public class TextInput implements UIComponent, QuickImports {
             deleteSelection();
         }
 
+        if (inputType.equals(InputType.NUMBER)) {
+            try {
+                double value = text.isEmpty() ? 0 : Double.parseDouble(text);
+                double newValue = Double.parseDouble(str);
+                if (newValue <= maxIntInput) text = String.valueOf(maxIntInput);
+                if (newValue >= minIntInput) text = String.valueOf(minIntInput);
+                moveCursor(text.length());
+            } catch (NumberFormatException e) {
+                return;
+            }
+        }
+
         if (text.length() + str.length() <= maxLength) {
             text = text.substring(0, cursorPosition) + str + text.substring(cursorPosition);
             moveCursor(str.length());
@@ -701,4 +890,18 @@ public class TextInput implements UIComponent, QuickImports {
     }
 
     public void setMaxLength(int maxLength) { this.maxLength = Math.max(0, maxLength); }
+
+    /**
+     * Interpole entre deux couleurs basé sur un facteur d'animation
+     */
+    private Color interpolateColor(Color from, Color to, float factor) {
+        factor = Math.max(0.0f, Math.min(1.0f, factor));
+        
+        int red = (int) (from.getRed() + (to.getRed() - from.getRed()) * factor);
+        int green = (int) (from.getGreen() + (to.getGreen() - from.getGreen()) * factor);
+        int blue = (int) (from.getBlue() + (to.getBlue() - from.getBlue()) * factor);
+        int alpha = (int) (from.getAlpha() + (to.getAlpha() - from.getAlpha()) * factor);
+        
+        return new Color(red, green, blue, alpha);
+    }
 }

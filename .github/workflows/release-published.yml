@@ -16,7 +16,6 @@ jobs:
           color: "3371747"
           username: "NoctisUI Release"
           avatar_url: "https://raw.githubusercontent.com/Libnaus/.github/refs/heads/main/profile/assets/img/logo.png"
-          content: "||@everyone||"
           footer_title: "NoctisUI Release ${{ github.event.release.tag_name }}"
           footer_icon: "https://raw.githubusercontent.com/Libnaus/.github/refs/heads/main/profile/assets/img/logo.png"
           footer_timestamp: true

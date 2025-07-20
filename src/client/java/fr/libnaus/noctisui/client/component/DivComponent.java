@@ -13,12 +13,9 @@ import java.util.List;
 
 public class DivComponent implements QuickImports, UIComponent {
 
-    // Getters et setters
-    // Position et dimensions
     @Getter
     private float x, y, width, height;
 
-    // Options de style
     @Getter
     private Color backgroundColor;
     @Setter
@@ -43,10 +40,8 @@ public class DivComponent implements QuickImports, UIComponent {
     private float blurRadius;
     private float blurOpacity = 1.0f;
 
-    // Composants enfants
     private List<UIComponent> children = new ArrayList<>();
 
-    // Contenu personnalisé (optionnel)
     private Runnable customRenderer;
 
     public DivComponent(float x, float y, float width, float height) {
@@ -56,7 +51,6 @@ public class DivComponent implements QuickImports, UIComponent {
         this.height = height;
     }
 
-    // Méthodes de configuration du style (pattern builder)
     public DivComponent withBackground(Color color) {
         this.backgroundColor = color;
         this.hasBackground = true;
@@ -93,7 +87,6 @@ public class DivComponent implements QuickImports, UIComponent {
         return this;
     }
 
-    // Gestion des enfants
     public DivComponent addChild(UIComponent child) {
         children.add(child);
         return this;
@@ -122,7 +115,6 @@ public class DivComponent implements QuickImports, UIComponent {
         matrices.push();
         matrices.translate(x, y, 0);
 
-        // Rendu du background avec blur si nécessaire
         if (hasBackground && !hasBlur) {
             if (cornerRadius > 0) {
                 Render2DEngine.drawRoundedRect(matrices, 0, 0, width, height, cornerRadius, backgroundColor);
@@ -131,7 +123,6 @@ public class DivComponent implements QuickImports, UIComponent {
             }
         }
 
-        // Rendu de l'outline
         if (hasOutline) {
             if (cornerRadius > 0) {
                 Render2DEngine.drawRoundedOutline(matrices, 0, 0, width, height, cornerRadius, outlineWidth, outlineColor);
@@ -140,22 +131,18 @@ public class DivComponent implements QuickImports, UIComponent {
             }
         }
 
-        // Rendu du contenu personnalisé
         if (customRenderer != null) {
             customRenderer.run();
         }
 
-        // Rendu des composants enfants
         for (UIComponent child : children) {
             child.render(matrices, mouseX - x, mouseY - y, delta);
         }
 
-        // Restaurer l'état de la matrice
         matrices.pop();
         RenderSystem.disableBlend();
     }
 
-    // Méthodes utilitaires
     public boolean contains(float mouseX, float mouseY) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
