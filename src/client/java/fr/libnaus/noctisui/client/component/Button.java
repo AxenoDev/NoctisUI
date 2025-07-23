@@ -4,41 +4,43 @@ import fr.libnaus.noctisui.client.NoctisUIClient;
 import fr.libnaus.noctisui.client.api.system.Render2DEngine;
 import fr.libnaus.noctisui.client.api.system.render.font.FontAtlas;
 import fr.libnaus.noctisui.client.common.QuickImports;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.awt.*;
 import java.util.function.Consumer;
 
+@Getter
 public class Button implements QuickImports, UIComponent {
 
     private float width, height, x, y;
-    private String label;
-    private Color labelColor;
-    private Color backgroundColor;
+    @Getter
+    @Setter private String label;
+    @Setter private Color labelColor;
+    @Setter private Color backgroundColor;
 
-    // Outline properties
     private boolean hasOutline = false;
     private Color outlineColor;
     private float outlineWidth;
 
-    // Blur properties
     private boolean hasBlur = false;
     private float blurRadius;
 
-    // Font properties
     private FontAtlas font = NoctisUIClient.getInstance().getFonts().getInterMedium();
 
-    // Hover properties
+    private int fontSize = 9;
+
+    private boolean shadow = false;
+
     private boolean hasHover = false;
-    private long hoverAnimationDuration; // in milliseconds
+    private long hoverAnimationDuration;
     private Color hoverBackgroundColor;
     private Color hoverLabelColor;
 
-    // Internal state for hover animation
     private long hoverStartTime = -1;
     private boolean isHovered = false;
 
-    // Action to perform on click
     private Consumer<Button> onClickAction;
 
     /**
@@ -100,6 +102,43 @@ public class Button implements QuickImports, UIComponent {
     }
 
     /**
+     * Sets the font size for the button's label.
+     *
+     * @param fontSize The new font size.
+     * @return This Button instance for chaining.
+     */
+    public Button setFontSize(int fontSize) {
+        this.fontSize = fontSize;
+        return this;
+    }
+
+    /**
+     * Sets the position of the button.
+     *
+     * @param x The new X-coordinate of the button's top-left corner.
+     * @param y The new Y-coordinate of the button's top-left corner.
+     * @return This Button instance for chaining.
+     */
+    public Button setPos(float x, float y) {
+        this.x = x;
+        this.y = y;
+        return this;
+    }
+
+    /**
+     * Sets the size of the button.
+     *
+     * @param width The new width of the button.
+     * @param height The new height of the button.
+     * @return This Button instance for chaining.
+     */
+    public Button setSize(float width, float height) {
+        this.width = width;
+        this.height = height;
+        return this;
+    }
+
+    /**
      * Configures hover effects for the button.
      *
      * @param animationDuration The duration of the hover animation in milliseconds.
@@ -126,9 +165,13 @@ public class Button implements QuickImports, UIComponent {
         return this;
     }
 
+    public Button setShadow(boolean shadow) {
+        this.shadow = shadow;
+        return this;
+    }
+
     @Override
     public void render(MatrixStack matrices, double mouseX, double mouseY, float delta) {
-// Determine current colors based on hover state
         Color currentBackgroundColor = backgroundColor;
         Color currentLabelColor = labelColor;
 
@@ -136,59 +179,50 @@ public class Button implements QuickImports, UIComponent {
 
         if (hasHover) {
             if (isMouseOver && !isHovered) {
-                // Mouse entered button area
                 isHovered = true;
                 hoverStartTime = System.currentTimeMillis();
             } else if (!isMouseOver && isHovered) {
-                // Mouse left button area
                 isHovered = false;
-                hoverStartTime = System.currentTimeMillis(); // Reset for smooth transition out
+                hoverStartTime = System.currentTimeMillis();
             }
 
             if (isHovered && hoverStartTime != -1) {
                 long elapsed = System.currentTimeMillis() - hoverStartTime;
                 float progress = Math.min(1f, (float) elapsed / hoverAnimationDuration);
 
-                // Interpolate colors
                 currentBackgroundColor = interpolateColor(backgroundColor, hoverBackgroundColor, progress);
                 currentLabelColor = interpolateColor(labelColor, hoverLabelColor, progress);
             } else if (!isHovered && hoverStartTime != -1) {
                 long elapsed = System.currentTimeMillis() - hoverStartTime;
                 float progress = Math.min(1f, (float) elapsed / hoverAnimationDuration);
-                // Interpolate back to original colors
                 currentBackgroundColor = interpolateColor(hoverBackgroundColor, backgroundColor, progress);
                 currentLabelColor = interpolateColor(hoverLabelColor, labelColor, progress);
                 if (progress == 1f) {
-                    hoverStartTime = -1; // Animation finished
+                    hoverStartTime = -1;
                 }
             }
         }
 
-        // Draw the button background
         if (hasBlur) {
             Render2DEngine.drawBlurredRoundedRect(matrices, x, y, width, height, 5.0f, blurRadius,
-             1.0F, currentBackgroundColor); // Using a fixed radius for blur, adjust as needed
+             1.0F, currentBackgroundColor);
         } else {
-            Render2DEngine.drawRoundedRect(matrices, x, y, width, height, 5.0f, currentBackgroundColor); // Using a fixed radius, adjust as needed
+            Render2DEngine.drawRoundedRect(matrices, x, y, width, height, 5.0f, currentBackgroundColor);
         }
 
-        // Draw the outline if enabled
         if (hasOutline) {
             Render2DEngine.drawRoundedOutline(matrices, x, y, width, height, 5.0f, outlineWidth, outlineColor); // Using a fixed radius, adjust as needed
         }
 
-        if (font != null) {
-            float textWidth = font.getWidth(label);
-            float textHeight = font.getLineHeight();
-            float textX = x + (width - textWidth) / 2;
-            float textY = y + (height - textHeight) / 2;
-            font.render(matrices, label, textX, textY, currentLabelColor.getRGB());
+        float textWidth = font.getWidth(label);
+        float textHeight = font.getLineHeight();
+        float textX = x + (width - textWidth) / 2;
+        float textY = y + (height - textHeight) / 2;
+
+        if (!shadow) {
+            font.render(matrices, label, textX, textY, fontSize, currentLabelColor.getRGB());
         } else {
-            float textWidth = mc.textRenderer.getWidth(label);
-            float textHeight = mc.textRenderer.fontHeight;
-            float textX = x + (width - textWidth) / 2;
-            float textY = y + (height - textHeight) / 2;
-            font.renderWithShadow(matrices, label, textX, textY, currentLabelColor.getRGB());
+            font.renderWithShadow(matrices, label, textX, textY, fontSize, currentLabelColor.getRGB());
         }
     }
 
@@ -213,11 +247,4 @@ public class Button implements QuickImports, UIComponent {
         float a = color1.getAlpha() + (color2.getAlpha() - color1.getAlpha()) * progress;
         return new Color((int) r, (int) g, (int) b, (int) a);
     }
-
-    // Getters for properties (optional, but good practice)
-    public float getX() { return x; }
-    public float getY() { return y; }
-    public float getWidth() { return width; }
-    public float getHeight() { return height; }
-    public String getLabel() { return label; }
 }
