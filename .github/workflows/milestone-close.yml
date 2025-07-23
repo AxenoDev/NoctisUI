@@ -56,7 +56,7 @@ jobs:
             ## Changements
             ${{ github.event.milestone.description }}
           files: |
+            build/devlibs/noctisui-*-dev.jar
             builds/**
-            build/devlibs/**
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
