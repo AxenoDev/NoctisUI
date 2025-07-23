@@ -42,6 +42,8 @@ public class Button implements QuickImports, UIComponent {
     private long hoverStartTime = -1;
     private boolean isHovered = false;
 
+    private int radius = 5;
+
     private Consumer<Button> onClickAction;
 
     /**
@@ -171,6 +173,11 @@ public class Button implements QuickImports, UIComponent {
         return this;
     }
 
+    public Button setRadius(int radius) {
+        this.radius = radius;
+        return this;
+    }
+
     @Override
     public void render(DrawContext context, double mouseX, double mouseY, float delta) {
         MatrixStack matrices = context.getMatrices();
@@ -206,14 +213,14 @@ public class Button implements QuickImports, UIComponent {
         }
 
         if (hasBlur) {
-            Render2DEngine.drawBlurredRoundedRect(matrices, x, y, width, height, 5.0f, blurRadius,
+            Render2DEngine.drawBlurredRoundedRect(matrices, x, y, width, height, radius, blurRadius,
              1.0F, currentBackgroundColor);
         } else {
-            Render2DEngine.drawRoundedRect(matrices, x, y, width, height, 5.0f, currentBackgroundColor);
+            Render2DEngine.drawRoundedRect(matrices, x, y, width, height, radius, currentBackgroundColor);
         }
 
         if (hasOutline) {
-            Render2DEngine.drawRoundedOutline(matrices, x, y, width, height, 5.0f, outlineWidth, outlineColor); // Using a fixed radius, adjust as needed
+            Render2DEngine.drawRoundedOutline(matrices, x, y, width, height, radius, outlineWidth, outlineColor); // Using a fixed radius, adjust as needed
         }
 
         float textWidth = font.getWidth(label, fontSize);
