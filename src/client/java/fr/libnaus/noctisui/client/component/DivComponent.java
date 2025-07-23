@@ -5,6 +5,7 @@ import fr.libnaus.noctisui.client.api.system.Render2DEngine;
 import fr.libnaus.noctisui.client.common.QuickImports;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.awt.*;
@@ -102,7 +103,8 @@ public class DivComponent implements QuickImports, UIComponent {
     }
 
     @Override
-    public void render(MatrixStack matrices, double mouseX, double mouseY, float delta) {
+    public void render(DrawContext context, double mouseX, double mouseY, float delta) {
+        MatrixStack matrices = context.getMatrices();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         if (hasBackground && hasBlur) {
@@ -136,7 +138,7 @@ public class DivComponent implements QuickImports, UIComponent {
         }
 
         for (UIComponent child : children) {
-            child.render(matrices, mouseX - x, mouseY - y, delta);
+            child.render(context, mouseX - x, mouseY - y, delta);
         }
 
         matrices.pop();

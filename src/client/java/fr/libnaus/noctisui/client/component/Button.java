@@ -6,6 +6,7 @@ import fr.libnaus.noctisui.client.api.system.render.font.FontAtlas;
 import fr.libnaus.noctisui.client.common.QuickImports;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 
 import java.awt.*;
@@ -171,7 +172,8 @@ public class Button implements QuickImports, UIComponent {
     }
 
     @Override
-    public void render(MatrixStack matrices, double mouseX, double mouseY, float delta) {
+    public void render(DrawContext context, double mouseX, double mouseY, float delta) {
+        MatrixStack matrices = context.getMatrices();
         Color currentBackgroundColor = backgroundColor;
         Color currentLabelColor = labelColor;
 
