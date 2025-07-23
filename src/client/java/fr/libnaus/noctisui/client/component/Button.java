@@ -217,7 +217,7 @@ public class Button implements QuickImports, UIComponent {
         }
 
         float textWidth = font.getWidth(label, fontSize);
-        float textHeight = font.getLineHeight();
+        float textHeight = font.getLineHeight(fontSize);
         float textX = x + (width - textWidth) / 2;
         float textY = y + (height - textHeight) / 2;
 
