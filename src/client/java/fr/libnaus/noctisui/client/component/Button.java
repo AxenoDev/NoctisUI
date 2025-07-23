@@ -31,6 +31,8 @@ public class Button implements QuickImports, UIComponent {
 
     private int fontSize = 9;
 
+    private boolean shadow = false;
+
     private boolean hasHover = false;
     private long hoverAnimationDuration;
     private Color hoverBackgroundColor;
@@ -163,6 +165,11 @@ public class Button implements QuickImports, UIComponent {
         return this;
     }
 
+    public Button setShadow(boolean shadow) {
+        this.shadow = shadow;
+        return this;
+    }
+
     @Override
     public void render(MatrixStack matrices, double mouseX, double mouseY, float delta) {
         Color currentBackgroundColor = backgroundColor;
@@ -207,18 +214,15 @@ public class Button implements QuickImports, UIComponent {
             Render2DEngine.drawRoundedOutline(matrices, x, y, width, height, 5.0f, outlineWidth, outlineColor); // Using a fixed radius, adjust as needed
         }
 
-        if (font != null) {
-            float textWidth = font.getWidth(label);
-            float textHeight = font.getLineHeight();
-            float textX = x + (width - textWidth) / 2;
-            float textY = y + (height - textHeight) / 2;
-            font.render(matrices, label, textX, textY, currentLabelColor.getRGB());
+        float textWidth = font.getWidth(label);
+        float textHeight = font.getLineHeight();
+        float textX = x + (width - textWidth) / 2;
+        float textY = y + (height - textHeight) / 2;
+
+        if (!shadow) {
+            font.render(matrices, label, textX, textY, fontSize, currentLabelColor.getRGB());
         } else {
-            float textWidth = mc.textRenderer.getWidth(label);
-            float textHeight = mc.textRenderer.fontHeight;
-            float textX = x + (width - textWidth) / 2;
-            float textY = y + (height - textHeight) / 2;
-            font.renderWithShadow(matrices, label, textX, textY, currentLabelColor.getRGB());
+            font.renderWithShadow(matrices, label, textX, textY, fontSize, currentLabelColor.getRGB());
         }
     }
 
