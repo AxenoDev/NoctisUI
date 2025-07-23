@@ -55,6 +55,8 @@ jobs:
             
             ## Changements
             ${{ github.event.milestone.description }}
-          files: builds/**
+          files: |
+            builds/**
+            build/devlibs/**
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
