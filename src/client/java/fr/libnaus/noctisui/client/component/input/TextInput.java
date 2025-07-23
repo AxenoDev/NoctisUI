@@ -7,6 +7,7 @@ import fr.libnaus.noctisui.client.common.QuickImports;
 import fr.libnaus.noctisui.client.component.UIComponent;
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -181,8 +182,10 @@ public class TextInput implements UIComponent, QuickImports {
     }
 
     @Override
-    public void render(MatrixStack matrices, double mouseX, double mouseY, float delta) {
+    public void render(DrawContext context, double mouseX, double mouseY, float delta) {
         if (!visible) return;
+
+        MatrixStack matrices = context.getMatrices();
 
         updateAnimations(mouseX, mouseY, delta);
         updateCursorBlink();
