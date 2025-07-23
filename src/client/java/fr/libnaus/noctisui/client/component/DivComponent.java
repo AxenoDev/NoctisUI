@@ -145,7 +145,7 @@ public class DivComponent implements QuickImports, UIComponent {
         RenderSystem.disableBlend();
     }
 
-    public boolean contains(float mouseX, float mouseY) {
+    public boolean contains(double mouseX, double mouseY) {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
 
@@ -189,7 +189,7 @@ public class DivComponent implements QuickImports, UIComponent {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (contains((float) mouseX - x, (float) mouseY - y)) {
+        if (contains(mouseX, mouseY)) {
             for (UIComponent child : children) {
                 child.mouseClicked(mouseX - x, mouseY - y, 0);
             }
