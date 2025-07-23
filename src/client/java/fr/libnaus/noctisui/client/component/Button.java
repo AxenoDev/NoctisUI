@@ -214,7 +214,7 @@ public class Button implements QuickImports, UIComponent {
             Render2DEngine.drawRoundedOutline(matrices, x, y, width, height, 5.0f, outlineWidth, outlineColor); // Using a fixed radius, adjust as needed
         }
 
-        float textWidth = font.getWidth(label);
+        float textWidth = font.getWidth(label, fontSize);
         float textHeight = font.getLineHeight();
         float textX = x + (width - textWidth) / 2;
         float textY = y + (height - textHeight) / 2;
