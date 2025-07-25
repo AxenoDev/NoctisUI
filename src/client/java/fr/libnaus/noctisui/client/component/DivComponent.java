@@ -19,24 +19,24 @@ public class DivComponent implements QuickImports, UIComponent {
 
     @Getter
     private Color backgroundColor;
-    @Setter
-    private boolean hasBackground = false;
+
     @Getter
-    @Setter
+    private boolean hasBackground = false;
+
+    @Getter
     private float cornerRadius = 0f;
 
     @Setter
     private boolean hasOutline = false;
-    @Setter
+
     @Getter
     private Color outlineColor;
-    @Setter
+
     @Getter
     private float outlineWidth;
 
-    @Setter
     private boolean hasBlur = false;
-    @Setter
+
     @Getter
     private float blurRadius;
     private float blurOpacity = 1.0f;
@@ -120,16 +120,14 @@ public class DivComponent implements QuickImports, UIComponent {
         if (hasBackground && !hasBlur) {
             if (cornerRadius > 0) {
                 Render2DEngine.drawRoundedRect(matrices, 0, 0, width, height, cornerRadius, backgroundColor);
+                if (hasOutline)
+                    Render2DEngine.drawRoundedOutline(matrices, 0, 0, width, height, cornerRadius, outlineWidth, outlineColor);
+                System.out.println("DivComponent: Drawing rounded rectangle at " + x + ", " + y + " with size " + width + "x" + height + " with outline " + hasOutline + " and background " + hasBackground);
             } else {
                 Render2DEngine.drawRect(matrices, 0, 0, width, height, backgroundColor);
-            }
-        }
-
-        if (hasOutline) {
-            if (cornerRadius > 0) {
-                Render2DEngine.drawRoundedOutline(matrices, 0, 0, width, height, cornerRadius, outlineWidth, outlineColor);
-            } else {
-                Render2DEngine.drawOutline(matrices, 0, 0, width, height, outlineWidth, outlineColor);
+                if (hasOutline)
+                    Render2DEngine.drawOutline(matrices, 0, 0, width, height, outlineWidth, outlineColor);
+                System.out.println("DivComponent: Drawing rectangle at " + x + ", " + y + " with size " + width + "x" + height + "with outline " + hasOutline + " and background " + hasBackground);
             }
         }
 
@@ -172,11 +170,6 @@ public class DivComponent implements QuickImports, UIComponent {
         this.y = y;
         this.width = width;
         this.height = height;
-    }
-
-    public void setBackgroundColor(Color backgroundColor) {
-        this.backgroundColor = backgroundColor;
-        this.hasBackground = backgroundColor != null;
     }
 
     public boolean hasBackground() { return hasBackground; }
