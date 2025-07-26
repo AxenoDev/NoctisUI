@@ -45,6 +45,13 @@ public class FontAtlas implements QuickImports {
 
     private final NativeImageBackedTexture tex;
 
+    public FontAtlas(final ResourceManager manager, final String name, String modid) throws IOException {
+        this(
+                new InputStreamReader(manager.open(Identifier.of(modid, "fonts/" + name + ".json"))),
+                manager.open(Identifier.of(modid, "fonts/" + name + ".png"))
+        );
+    }
+
     public FontAtlas(final ResourceManager manager, final String name) throws IOException {
         this(
                 new InputStreamReader(manager.open(Identifier.of(NoctisUI.MODID, "fonts/" + name + ".json"))),
