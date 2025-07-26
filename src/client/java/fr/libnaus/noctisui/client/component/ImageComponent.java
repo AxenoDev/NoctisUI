@@ -1,10 +1,8 @@
 package fr.libnaus.noctisui.client.component;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import fr.libnaus.noctisui.client.api.system.Render2DEngine;
 import lombok.Getter;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 @Getter
