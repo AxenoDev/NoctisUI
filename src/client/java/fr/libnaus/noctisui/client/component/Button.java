@@ -16,8 +16,7 @@ import java.util.function.Consumer;
 public class Button implements QuickImports, UIComponent {
 
     private float width, height, x, y;
-    @Getter
-    @Setter private String label;
+    @Getter @Setter private String label;
     @Setter private Color labelColor;
     @Setter private Color backgroundColor;
 
