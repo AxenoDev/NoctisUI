@@ -122,12 +122,10 @@ public class DivComponent implements QuickImports, UIComponent {
                 Render2DEngine.drawRoundedRect(matrices, 0, 0, width, height, cornerRadius, backgroundColor);
                 if (hasOutline)
                     Render2DEngine.drawRoundedOutline(matrices, 0, 0, width, height, cornerRadius, outlineWidth, outlineColor);
-                System.out.println("DivComponent: Drawing rounded rectangle at " + x + ", " + y + " with size " + width + "x" + height + " with outline " + hasOutline + " and background " + hasBackground);
             } else {
                 Render2DEngine.drawRect(matrices, 0, 0, width, height, backgroundColor);
                 if (hasOutline)
                     Render2DEngine.drawOutline(matrices, 0, 0, width, height, outlineWidth, outlineColor);
-                System.out.println("DivComponent: Drawing rectangle at " + x + ", " + y + " with size " + width + "x" + height + "with outline " + hasOutline + " and background " + hasBackground);
             }
         }
 
