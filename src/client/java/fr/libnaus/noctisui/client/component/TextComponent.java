@@ -10,13 +10,13 @@ import java.awt.*;
 
 public class TextComponent implements UIComponent {
 
-    @Getter private int x, y;
+    @Getter private float x, y;
+    @Getter private float fontSize;
     @Getter private String text;
-    @Getter private int fontSize;
     @Getter private Color color;
     @Getter private FontAtlas font;
 
-    public TextComponent(int x, int y, String text, int fontSize, Color color) {
+    public TextComponent(float x, float y, String text, float fontSize, Color color) {
         this.x = x;
         this.y = y;
         this.text = text;
@@ -25,7 +25,7 @@ public class TextComponent implements UIComponent {
         this.font = NoctisUIClient.getInstance().getFonts().getPoppins();
     }
 
-    public TextComponent(int x, int y, String text, int fontSize, Color color, FontAtlas font) {
+    public TextComponent(float x, float y, String text, float fontSize, Color color, FontAtlas font) {
         this.x = x;
         this.y = y;
         this.text = text;
@@ -34,7 +34,7 @@ public class TextComponent implements UIComponent {
         this.font = font != null ? font : NoctisUIClient.getInstance().getFonts().getPoppins();
     }
 
-    public TextComponent setPosition(int x, int y) {
+    public TextComponent setPosition(float x, float y) {
         this.x = x;
         this.y = y;
         return this;
@@ -45,7 +45,7 @@ public class TextComponent implements UIComponent {
         return this;
     }
 
-    public TextComponent setFontSize(int fontSize) {
+    public TextComponent setFontSize(float fontSize) {
         this.fontSize = fontSize;
         return this;
     }
