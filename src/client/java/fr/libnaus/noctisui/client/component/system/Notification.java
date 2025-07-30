@@ -9,6 +9,7 @@ import java.awt.*;
 @Getter
 public class Notification implements QuickImports {
     private final NotificationType type;
+    private final String id;
     private final String title;
     private final String message;
     private final Color color;
@@ -25,7 +26,8 @@ public class Notification implements QuickImports {
     @Getter
     private long lastStackTime;
 
-    public Notification(String title, String message, NotificationType type, long duration) {
+    public Notification(String id, String title, String message, NotificationType type, long duration) {
+        this.id = id;
         this.title = title;
         this.message = message;
         this.type = type;
@@ -40,13 +42,14 @@ public class Notification implements QuickImports {
     }
 
     public void update() {
-        long elapsed = System.currentTimeMillis() - lastStackTime;
+        long elapsedSinceCreation = System.currentTimeMillis() - creationTime;
+        long elapsedSinceLastStack = System.currentTimeMillis() - lastStackTime;
 
-        if (elapsed < 300) {
-            float t = elapsed / 300f;
+        if (elapsedSinceCreation < 300) {
+            float t = elapsedSinceCreation / 300f;
             animationProgress = 1f - (1f - t) * (1f - t);
-        } else if (elapsed > duration - 200) {
-            float fadeProgress = (elapsed - (duration - 200)) / 200f;
+        } else if (elapsedSinceLastStack > duration - 200) {
+            float fadeProgress = (elapsedSinceLastStack - (duration - 200)) / 200f;
             animationProgress = 1f - fadeProgress * fadeProgress;
         } else {
             animationProgress = 1f;
@@ -87,11 +90,7 @@ public class Notification implements QuickImports {
 
     public boolean isSimilarTo(Notification other) {
         if (other == null) return false;
-        return this.type == other.type &&
-                ((this.title == null && other.title == null) ||
-                        (this.title != null && this.title.equalsIgnoreCase(other.title))) &&
-                ((this.message == null && other.message == null) ||
-                        (this.message != null && this.message.equalsIgnoreCase(other.message)));
+        return this.getId().equals(other.getId());
     }
 
 
