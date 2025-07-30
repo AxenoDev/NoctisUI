@@ -11,6 +11,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class DivComponent implements QuickImports, UIComponent {
 
@@ -39,9 +40,10 @@ public class DivComponent implements QuickImports, UIComponent {
 
     @Getter
     private float blurRadius;
-    private float blurOpacity = 1.0f;
 
-    private List<UIComponent> children = new ArrayList<>();
+    private Consumer<DivComponent> onClickAction;
+
+    private final List<UIComponent> children = new ArrayList<>();
 
     private Runnable customRenderer;
 
@@ -78,7 +80,6 @@ public class DivComponent implements QuickImports, UIComponent {
 
     public DivComponent withBlur(float radius, float opacity) {
         this.blurRadius = radius;
-        this.blurOpacity = opacity;
         this.hasBlur = true;
         return this;
     }
@@ -102,17 +103,28 @@ public class DivComponent implements QuickImports, UIComponent {
         children.clear();
     }
 
+    /**
+     * Sets the action to be performed when the button is clicked.
+     *
+     * @param action A Consumer that accepts the Button instance when clicked.
+     * @return This Button instance for chaining.
+     */
+    public DivComponent setOnClick(Consumer<DivComponent> action) {
+        this.onClickAction = action;
+        return this;
+    }
+
     @Override
     public void render(DrawContext context, double mouseX, double mouseY, float delta) {
         MatrixStack matrices = context.getMatrices();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        if (hasBackground && hasBlur) {
-            Render2DEngine.drawBlurredRoundedRect(
-                    matrices, x, y, width, height,
-                    cornerRadius, blurRadius, blurOpacity, backgroundColor
-            );
-        }
+//        if (hasBackground && hasBlur) {
+//            Render2DEngine.drawBlurredRoundedRect(
+//                    matrices, x, y, width, height,
+//                    cornerRadius, blurRadius, blurOpacity, backgroundColor
+//            );
+//        }
 
         matrices.push();
         matrices.translate(x, y, 0);
@@ -147,6 +159,9 @@ public class DivComponent implements QuickImports, UIComponent {
 
     public void onClick(float mouseX, float mouseY) {
         if (contains(mouseX, mouseY)) {
+            if (onClickAction != null) {
+                onClickAction.accept(this);
+            }
             for (UIComponent child : children) {
                 child.mouseClicked(mouseX - x, mouseY - y, 0);
             }
