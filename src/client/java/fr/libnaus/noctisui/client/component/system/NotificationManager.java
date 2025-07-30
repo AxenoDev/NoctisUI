@@ -33,12 +33,12 @@ public class NotificationManager implements QuickImports {
         HudRenderCallback.EVENT.register(NotificationManager::renderNotifications);
     }
 
-    public void addNotification(String title, String message, NotificationType type) {
-        addNotification(title, message, type, 3000);
+    public void addNotification(String id, String title, String message, NotificationType type) {
+        addNotification(id, title, message, type, 3000);
     }
 
-    public void addNotification(String title, String message, NotificationType type, long duration) {
-        Notification newNotification = new Notification(title, message, type, duration);
+    public void addNotification(String id, String title, String message, NotificationType type, long duration) {
+        Notification newNotification = new Notification(id, title, message, type, duration);
 
         for (Notification existing : notifications) {
             if (existing.isSimilarTo(newNotification)) {
@@ -50,20 +50,20 @@ public class NotificationManager implements QuickImports {
         notifications.add(newNotification);
     }
 
-    public void success(String title, String message) {
-        addNotification(title, message, NotificationType.SUCCESS);
+    public void success(String id, String title, String message) {
+        addNotification(id, title, message, NotificationType.SUCCESS);
     }
 
-    public void error(String title, String message) {
-        addNotification(title, message, NotificationType.ERROR);
+    public void error(String id, String title, String message) {
+        addNotification(id, title, message, NotificationType.ERROR);
     }
 
-    public void warning(String title, String message) {
-        addNotification(title, message, NotificationType.WARNING);
+    public void warning(String id, String title, String message) {
+        addNotification(id, title, message, NotificationType.WARNING);
     }
 
-    public void info(String title, String message) {
-        addNotification(title, message, NotificationType.INFO);
+    public void info(String id, String title, String message) {
+        addNotification(id, title, message, NotificationType.INFO);
     }
 
     private static void renderNotifications(DrawContext ctx, float tickDelta) {
