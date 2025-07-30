@@ -18,9 +18,9 @@ public class NoctisUIClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         instance = this;
-        NotificationManager.init();
         this.fonts = new Fonts();
         Shaders.load();
         new NotificationManager();
+        NotificationManager.init();
     }
 }

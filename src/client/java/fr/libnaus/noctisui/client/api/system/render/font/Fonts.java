@@ -1,7 +1,7 @@
 package fr.libnaus.noctisui.client.api.system.render.font;
 
 import fr.libnaus.noctisui.NoctisUI;
-import fr.libnaus.noctisui.client.NoctisUIClient;
+import fr.libnaus.noctisui.client.component.system.NotificationManager;
 import lombok.Getter;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
@@ -35,6 +35,8 @@ public class Fonts implements SimpleSynchronousResourceReloadListener {
             this.poppins = new FontAtlas(manager, "poppins");
             this.icons = new FontAtlas(manager, "icons");
             this.lucide = new FontAtlas(manager, "lucide");
+
+            NotificationManager.initFont(this);
         } catch (final IOException e) {
             throw new RuntimeException("Couldn't load fonts", e);
         }
