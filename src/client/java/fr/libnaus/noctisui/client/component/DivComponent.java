@@ -119,12 +119,12 @@ public class DivComponent implements QuickImports, UIComponent {
         MatrixStack matrices = context.getMatrices();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        if (hasBackground && hasBlur) {
-            Render2DEngine.drawBlurredRoundedRect(
-                    matrices, x, y, width, height,
-                    cornerRadius, blurRadius, blurOpacity, backgroundColor
-            );
-        }
+//        if (hasBackground && hasBlur) {
+//            Render2DEngine.drawBlurredRoundedRect(
+//                    matrices, x, y, width, height,
+//                    cornerRadius, blurRadius, blurOpacity, backgroundColor
+//            );
+//        }
 
         matrices.push();
         matrices.translate(x, y, 0);
