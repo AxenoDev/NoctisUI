@@ -4,29 +4,64 @@ on:
   milestone:
     types: [closed]
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
-  build-release:
+  handle-milestone:
     runs-on: ubuntu-latest
     steps:
-      - name: Verify milestone name
-        run: |
-          if [[ ! "${{ github.event.milestone.title }}" =~ ^[a-zA-Z0-9_\.\-]+$ ]]; then
-            echo "Invalid milestone name: '${{ github.event.milestone.title }}'. Only alphanumeric characters, underscores, dots, and hyphens are allowed."
-            exit 1
-          fi
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Check if milestone is docs
+        id: check_docs
+        run: |
+          if [[ "${{ github.event.milestone.title }}" == docs* ]]; then
+            echo "is_docs=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_docs=false" >> $GITHUB_OUTPUT
+          fi
+
+      # -----------------------------
+      # Build and preview VitePress docs
+      # -----------------------------
+      - name: Set up Node.js
+        if: steps.check_docs.outputs.is_docs == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        if: steps.check_docs.outputs.is_docs == 'true'
+        run: npm ci
+
+      - name: Build VitePress docs
+        if: steps.check_docs.outputs.is_docs == 'true'
+        run: npm run docs:build
+
+      - name: Deploy to GitHub Pages
+        if: steps.check_docs.outputs.is_docs == 'true'
+        uses: actions/deploy-pages@v4
+
+      # -----------------------------
+      # Build and release NoctisUI
+      # -----------------------------
       - name: Set up JDK 21
+        if: steps.check_docs.outputs.is_docs == 'false'
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
 
       - name: Make gradlew executable
+        if: steps.check_docs.outputs.is_docs == 'false'
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
+        if: steps.check_docs.outputs.is_docs == 'false'
         run: |
           VERSION=$(echo ${{ github.event.milestone.title }} | tr "." "_")
           ./gradlew build remapJar
@@ -37,12 +72,14 @@ jobs:
           TAG: ${{ github.event.milestone.title }}
 
       - name: Upload artifact
+        if: steps.check_docs.outputs.is_docs == 'false'
         uses: actions/upload-artifact@v4
         with:
           name: noctisui-${{ github.event.milestone.title }}.jar
           path: builds/
 
       - name: Create GitHub Release
+        if: steps.check_docs.outputs.is_docs == 'false'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.milestone.title }}
