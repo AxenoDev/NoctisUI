@@ -42,4 +42,7 @@ gradle-app.setting
 # Minecraft client/server files
 run/
 
-# End of https://mrkandreev.name/snippets/gitignore-generator/#Java,Gradle,ForgeGradle
+# node_modules
+node_modules/
+docs/.vitepress/cache
+docs/.vitepress/dist
