@@ -42,6 +42,12 @@ jobs:
         if: steps.check_docs.outputs.is_docs == 'true'
         run: npm run docs:build
 
+      - name: Upload Pages artifact
+        if: steps.check_docs.outputs.is_docs == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.vitepress/dist'
+
       - name: Deploy to GitHub Pages
         if: steps.check_docs.outputs.is_docs == 'true'
         uses: actions/deploy-pages@v4
