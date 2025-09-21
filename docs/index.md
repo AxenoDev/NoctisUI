@@ -5,7 +5,7 @@ layout: home
 hero:
   name: "NoctisUI - Libnaus"
   text: "NoctisUI is a Minecraft UI library"
-  tagline: My great project tagline
+  tagline: "Build beautiful and functional user interfaces for Minecraft mods with ease."
   actions:
     - theme: brand
       text: Markdown Examples
