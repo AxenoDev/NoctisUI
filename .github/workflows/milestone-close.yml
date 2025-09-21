@@ -114,6 +114,5 @@ jobs:
     name: Deploy
     steps:
       - name: Deploy to GitHub Pages
-        if: steps.check_docs.outputs.is_docs == 'true'
         id: deployment
         uses: actions/deploy-pages@v4
