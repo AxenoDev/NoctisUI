@@ -52,9 +52,17 @@ public class Notification implements QuickImports
      */
     public Notification(String id, String title, String message, NotificationType type, long duration)
     {
-        this.id = id; this.title = title; this.message = message; this.type = type; this.color = type.getDefaultColor();
-        this.duration = duration; this.creationTime = System.currentTimeMillis();
-        this.lastStackTime = this.creationTime; this.animationProgress = 0f; this.targetY = 0f; this.currentY = 0f;
+        this.id = id;
+        this.title = title;
+        this.message = message;
+        this.type = type;
+        this.color = type.getDefaultColor();
+        this.duration = duration;
+        this.creationTime = System.currentTimeMillis();
+        this.lastStackTime = this.creationTime;
+        this.animationProgress = 0f;
+        this.targetY = 0f;
+        this.currentY = 0f;
         this.yVelocity = 0f;
     }
 
