@@ -37,7 +37,8 @@ export default defineConfig({
                 text: 'Examples',
                 items: [
                     { text: 'Basic Button', link: '/examples/basic-button' },
-                    { text: 'Container Layout', link: '/examples/container-layout' }
+                    { text: 'Container Layout', link: '/examples/container-layout' },
+                    { text: 'Custom Screen', link: '/examples/custom-screen' }
                 ]
             },
             {
