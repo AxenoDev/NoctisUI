@@ -221,7 +221,8 @@ public class TextInput extends UIBaseComponent implements QuickImports
 
         Render2DEngine.drawRoundedRect(matrices, x, y, width, height, borderRadius, bgColor);
 
-        float validationBorderWidth = borderWidth + (validationAnimationProgress);
+        // Use validationAnimationProgress as a scale factor for border width
+        float validationBorderWidth = borderWidth + (validationAnimationProgress * 1.0f);
         Render2DEngine.drawRoundedOutline(matrices, x, y, width, height, borderRadius, validationBorderWidth, bColor);
 
         float rightPadding = getRightPadding();
