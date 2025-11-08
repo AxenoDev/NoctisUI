@@ -27,12 +27,6 @@ public class Shaders implements QuickImports, SimpleSynchronousResourceReloadLis
     public static Uniform colorPickerHue;
     public static Uniform colorPickerAlpha;
 
-    public static Uniform blurInputResolution;
-    public static Uniform blurSize;
-    public static Uniform blurLocation;
-    public static Uniform blurRadius;
-    public static Uniform blurBrightness;
-    public static Uniform blurQuality;
     public static Uniform color;
 
     @Getter
