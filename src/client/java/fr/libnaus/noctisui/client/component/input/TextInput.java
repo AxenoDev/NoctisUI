@@ -91,6 +91,7 @@ public class TextInput extends UIBaseComponent implements QuickImports
     private boolean showTooltip = false;
     private long tooltipShowTime = 0;
     private final float ANIMATION_SPEED = 0.08f;
+    private static final float TOOLTIP_DELAY = 1000;
 
     private float passwordIconHover = 0.0f;
     private float searchIconHover = 0.0f;
@@ -280,7 +281,6 @@ public class TextInput extends UIBaseComponent implements QuickImports
                 showTooltip = true;
             }
 
-            float TOOLTIP_DELAY = 1000;
             if (System.currentTimeMillis() - tooltipShowTime > TOOLTIP_DELAY)
                 tooltipAnimationProgress = MathUtils.lerp(tooltipAnimationProgress, 1.0f, ANIMATION_SPEED * 2.0f);
         }
