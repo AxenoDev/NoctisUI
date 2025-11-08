@@ -255,6 +255,7 @@ public class DivComponent extends UIBaseComponent implements QuickImports
      *
      * @return {@code true} if the mouse is within bounds; otherwise {@code false}.
      */
+    @Override
     public boolean contains(double mouseX, double mouseY)
     {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
