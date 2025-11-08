@@ -32,7 +32,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author axeno
  *
  */
-public class NotificationManager implements QuickImports
+public class NotificationManager
 {
 
     private static final int NOTIFICATION_WIDTH = 220;
