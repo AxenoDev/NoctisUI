@@ -18,6 +18,33 @@ Ce framework puissant vous donne les outils nécessaires pour concevoir des menu
 > Il peut donc contenir des **bugs** / des **problèmes de performance**.
 > N'hésitez pas à nous faire part de vos retours, dans les [issues du repo](https://github.com/Libnaus/NoctisUI/issues).
 
+### 📦 Utilisation comme dépendance
+
+NoctisUI est disponible sur GitHub Packages et peut être utilisé comme dépendance dans vos mods Fabric.
+
+#### Installation rapide
+
+Ajoutez à votre `build.gradle`:
+
+```gradle
+repositories {
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/AxenoDev/NoctisUI")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+}
+
+dependencies {
+    modImplementation "fr.libnaus:noctisui:1.0.0"
+}
+```
+
+Pour plus de détails sur l'installation et la configuration, consultez [MAVEN_PUBLISHING.md](MAVEN_PUBLISHING.md).
+
 ### Contribution
 1. Forkez le projet
 2. Assurez-vous de bien suivre les [conventions de contribution](CONTRIBUTING.md)
