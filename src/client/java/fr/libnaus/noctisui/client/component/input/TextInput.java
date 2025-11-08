@@ -275,8 +275,10 @@ public class TextInput extends UIBaseComponent implements QuickImports
         validationAnimationProgress = MathUtils.lerp(validationAnimationProgress, validationTarget, ANIMATION_SPEED * 2.0f);
 
         if (showValidation && !isValid() && !text.isEmpty()) {
-            if (!showTooltip)
-                tooltipShowTime = System.currentTimeMillis(); showTooltip = true;
+            if (!showTooltip) {
+                tooltipShowTime = System.currentTimeMillis();
+                showTooltip = true;
+            }
 
             float TOOLTIP_DELAY = 1000;
             if (System.currentTimeMillis() - tooltipShowTime > TOOLTIP_DELAY)
