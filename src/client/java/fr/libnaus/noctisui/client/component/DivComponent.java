@@ -241,7 +241,7 @@ public class DivComponent extends UIBaseComponent implements QuickImports
         if (customRenderer != null) customRenderer.run();
 
         for (UIBaseComponent child : children) {
-            if (!child.isVisible() || !child.enabled) continue; child.render(context, mouseX, mouseY, delta);
+            if (!child.isVisible() || !child.enabled) continue; child.render(context, mouseX - x, mouseY - y, delta);
         }
 
         matrices.pop(); RenderSystem.disableBlend();
