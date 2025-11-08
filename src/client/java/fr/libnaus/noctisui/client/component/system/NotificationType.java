@@ -32,6 +32,7 @@ public enum NotificationType
      */
     NotificationType(Color defaultColor, String icon)
     {
-        this.defaultColor = defaultColor; this.icon = icon;
+        this.defaultColor = defaultColor;
+        this.icon = icon;
     }
 }
