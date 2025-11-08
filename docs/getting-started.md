@@ -33,17 +33,11 @@ repositories {
 
 dependencies {
     // Add NoctisUI as a dependency
-    modImplementation "fr.libnaus:noctisui:${project.noctisui_version}"
+    modImplementation "fr.libnaus:noctisui:1.0.0"
 }
 ```
 
-2. Add the version property to your `gradle.properties`:
-
-```properties
-noctisui_version=1.0.0
-```
-
-3. Add NoctisUI to your `fabric.mod.json` dependencies:
+2. Add NoctisUI to your `fabric.mod.json` dependencies:
 
 ```json
 {
