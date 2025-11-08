@@ -3,204 +3,306 @@ package fr.libnaus.noctisui.client.component;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.libnaus.noctisui.client.api.system.Render2DEngine;
 import fr.libnaus.noctisui.client.common.QuickImports;
+import fr.libnaus.noctisui.client.utils.Color;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
-public class DivComponent implements QuickImports, UIComponent {
-
-    @Getter
-    private float x, y, width, height;
-
-    @Getter
-    private Color backgroundColor;
-
-    @Getter
-    private boolean hasBackground = false;
-
-    @Getter
-    private float cornerRadius = 0f;
+/**
+ * <p>
+ * A versatile container component that can hold multiple {@link UIBaseComponent} children.
+ * </p>
+ * <p>
+ * The {@code DivComponent} supports background rendering (with optional rounded corners),
+ * outlines, click handling, and a custom render hook. It acts as a container resetting
+ * its children's coordinate space to (0,0) relative to itself.
+ * </p>
+ *
+ * <pre>
+ * {@code
+ * DivComponent div = new DivComponent(10, 10, 200, 100);
+ * div.setBackgroundColor(new Color(0, 0, 0, 150));
+ * div.setCornerRadius(10);
+ * div.setOutline(Color.WHITE, 2);
+ * div.setOnClick(c -> System.out.println("Div clicked!"));
+ * div.addChild(new TextComponent(20, 20, "Hello, World!", 14, Color.WHITE));
+ * }
+ * </pre>
+ *
+ * @author axeno
+ */
+@Getter
+public class DivComponent extends UIBaseComponent implements QuickImports
+{
 
     @Setter
-    private boolean hasOutline = false;
+    private Color backgroundColor = null;
+    private float cornerRadius = 0f;
 
-    @Getter
     private Color outlineColor;
-
-    @Getter
-    private float outlineWidth;
-
-    private boolean hasBlur = false;
-
-    @Getter
-    private float blurRadius;
+    private float outlineWidth = 0f;
 
     private Consumer<DivComponent> onClickAction;
+    private final List<UIBaseComponent> children = new ArrayList<>();
 
-    private final List<UIComponent> children = new ArrayList<>();
-
+    @Setter
     private Runnable customRenderer;
 
-    public DivComponent(float x, float y, float width, float height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+    /**
+     * Creates a new {@code DivComponent} with the specified position and size.
+     *
+     * @param x      The x-coordinate of the component.
+     * @param y      The y-coordinate of the component.
+     * @param width  The width of the component.
+     * @param height The height of the component.
+     */
+    public DivComponent(float x, float y, float width, float height)
+    {
+        super(x, y, width, height);
     }
 
-    public DivComponent withBackground(Color color) {
-        this.backgroundColor = color;
-        this.hasBackground = true;
-        return this;
+    /**
+     * Sets the corner radius for rounded corners.
+     *
+     * <pre>
+     * {@code
+     * div.setCornerRadius(12); // Rounded corners of 12 pixels
+     * div.setCornerRadius(0);  // Sharp corners
+     * }
+     * </pre>
+     *
+     * @param radius The corner radius. Values below 0 are clamped to 0.
+     */
+    public void setCornerRadius(float radius)
+    {
+        this.cornerRadius = Math.max(0, radius);
     }
 
-    public DivComponent withCornerRadius(float radius) {
-        this.cornerRadius = radius;
-        return this;
+    /**
+     * Sets the outline color and width for this component.
+     *
+     * <pre>
+     * {@code
+     * div.setOutline(Color.RED, 3);  // Red outline with 3px thickness
+     * div.setOutline(Color.BLUE, 0); // Removes outline
+     * }
+     * </pre>
+     *
+     * @param color The outline color.
+     * @param width The outline thickness in pixels. Values below 0 are clamped to 0.
+     */
+    public void setOutline(Color color, float width)
+    {
+        this.outlineColor = color; this.outlineWidth = Math.max(0, width);
     }
 
-    public DivComponent withOutline(Color color, float width) {
-        this.outlineColor = color;
-        this.outlineWidth = width;
-        this.hasOutline = true;
-        return this;
+    /**
+     * Defines an action to execute when this component is clicked.
+     *
+     * <pre>
+     * {@code
+     * div.setOnClick(c -> System.out.println("Clicked at: " + c.getX() + "," + c.getY()));
+     * }
+     * </pre>
+     *
+     * @param action A {@link Consumer} that receives this {@code DivComponent} when clicked.
+     */
+    public void setOnClick(Consumer<DivComponent> action)
+    {
+        this.onClickAction = action;
     }
 
-    public DivComponent withBlur(float radius) {
-        this.blurRadius = radius;
-        this.hasBlur = true;
-        return this;
-    }
-
-    public DivComponent withBlur(float radius, float opacity) {
-        this.blurRadius = radius;
-        this.hasBlur = true;
-        return this;
-    }
-
-    public DivComponent withCustomRenderer(Runnable renderer) {
-        this.customRenderer = renderer;
-        return this;
-    }
-
-    public DivComponent addChild(UIComponent child) {
+    /**
+     * Adds a single child component to this container.
+     *
+     * <pre>
+     * {@code
+     * div.addChild(new TextComponent(10, 10, "Hello", 14, Color.WHITE));
+     * }
+     * </pre>
+     *
+     * @param child The {@link UIBaseComponent} to add.
+     */
+    public void addChild(UIBaseComponent child)
+    {
         children.add(child);
-        return this;
     }
 
-    public DivComponent removeChild(UIComponent child) {
+    /**
+     * Adds multiple child components to this container at once.
+     *
+     * <pre>
+     * {@code
+     * div.addChildren(
+     *     new TextComponent(10, 10, "Hello", 14, Color.WHITE),
+     *     new ImageComponent(20, 20, 50, 50, texture)
+     * );
+     * }
+     * </pre>
+     *
+     * @param children The {@link UIBaseComponent} instances to add.
+     */
+    public void addChildren(UIBaseComponent... children)
+    {
+        for (UIBaseComponent child : children)
+            addChild(child);
+    }
+
+    /**
+     * Removes a specific child component from this container.
+     *
+     * <pre>
+     * {@code
+     * div.removeChild(textComponent);
+     * }
+     * </pre>
+     *
+     * @param child The {@link UIBaseComponent} to remove.
+     */
+    public void removeChild(UIBaseComponent child)
+    {
         children.remove(child);
-        return this;
     }
 
-    public void clearChildren() {
+    /**
+     * Removes all child components that match the given filter condition.
+     * <p>
+     * This method allows you to dynamically clean or filter child elements
+     * based on custom logic.
+     * </p>
+     *
+     * <pre>
+     * {@code
+     * // Remove all invisible components
+     * div.removeIf(child -> !child.isVisible());
+     *
+     * // Remove all text-based components
+     * div.removeIf(child -> child instanceof TextComponent);
+     * }
+     * </pre>
+     *
+     * @param filter A predicate determining which children to remove.
+     *               Components returning {@code true} are removed.
+     */
+    public void removeIf(Predicate<UIBaseComponent> filter)
+    {
+        children.removeIf(filter);
+    }
+
+    /**
+     * Removes all children from this component.
+     *
+     * <pre>
+     * {@code
+     * div.clearChildren(); // Removes all child components
+     * }
+     * </pre>
+     */
+    public void clearChildren()
+    {
         children.clear();
     }
 
     /**
-     * Sets the action to be performed when the button is clicked.
+     * Renders this container, its background, outline, and all visible children.
      *
-     * @param action A Consumer that accepts the Button instance when clicked.
-     * @return This Button instance for chaining.
+     * @param context The {@link DrawContext} used for rendering.
+     * @param mouseX  The current mouse X position.
+     * @param mouseY  The current mouse Y position.
+     * @param delta   Partial tick delta for animations or transitions.
      */
-    public DivComponent setOnClick(Consumer<DivComponent> action) {
-        this.onClickAction = action;
-        return this;
-    }
-
     @Override
-    public void render(DrawContext context, double mouseX, double mouseY, float delta) {
-        MatrixStack matrices = context.getMatrices();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-//        if (hasBackground && hasBlur) {
-//            Render2DEngine.drawBlurredRoundedRect(
-//                    matrices, x, y, width, height,
-//                    cornerRadius, blurRadius, blurOpacity, backgroundColor
-//            );
-//        }
+    public void render(DrawContext context, double mouseX, double mouseY, float delta)
+    {
+        if (!visible) return;
 
-        matrices.push();
-        matrices.translate(x, y, 0);
+        MatrixStack matrices = context.getMatrices(); RenderSystem.enableBlend(); RenderSystem.defaultBlendFunc();
 
-        if (hasBackground && !hasBlur) {
+        matrices.push(); matrices.translate(x, y, 0);
+
+        if (backgroundColor != null) {
             if (cornerRadius > 0) {
                 Render2DEngine.drawRoundedRect(matrices, 0, 0, width, height, cornerRadius, backgroundColor);
-                if (hasOutline)
+                if (outlineWidth > 0)
                     Render2DEngine.drawRoundedOutline(matrices, 0, 0, width, height, cornerRadius, outlineWidth, outlineColor);
-            } else {
-                Render2DEngine.drawRect(matrices, 0, 0, width, height, backgroundColor);
-                if (hasOutline)
+            }
+            else {
+                Render2DEngine.drawRect(matrices, 0, 0, width, height, backgroundColor); if (outlineWidth > 0)
                     Render2DEngine.drawOutline(matrices, 0, 0, width, height, outlineWidth, outlineColor);
             }
         }
 
-        if (customRenderer != null) {
-            customRenderer.run();
+        if (customRenderer != null) customRenderer.run();
+
+        for (UIBaseComponent child : children) {
+            if (!child.isVisible() || !child.enabled) continue; child.render(context, mouseX, mouseY, delta);
         }
 
-        for (UIComponent child : children) {
-            child.render(context, mouseX - x, mouseY - y, delta);
-        }
-
-        matrices.pop();
-        RenderSystem.disableBlend();
+        matrices.pop(); RenderSystem.disableBlend();
     }
 
-    public boolean contains(double mouseX, double mouseY) {
+    /**
+     * Determines whether the given mouse coordinates are inside this component.
+     *
+     * @param mouseX The X coordinate of the mouse.
+     * @param mouseY The Y coordinate of the mouse.
+     *
+     * @return {@code true} if the mouse is within bounds; otherwise {@code false}.
+     */
+    public boolean contains(double mouseX, double mouseY)
+    {
         return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
     }
 
-    public void onClick(float mouseX, float mouseY) {
+    /**
+     * Handles a click interaction within this component.
+     * <p>
+     * If the click occurs within the component’s bounds, the click action (if defined)
+     * is executed and the event is propagated to all child components.
+     * </p>
+     *
+     * <pre>
+     * {@code
+     * div.onClick(mouseX, mouseY); // Triggers click action if inside bounds
+     * }
+     * </pre>
+     *
+     * @param mouseX The x-coordinate of the mouse click.
+     * @param mouseY The y-coordinate of the mouse click.
+     */
+    public void onClick(float mouseX, float mouseY)
+    {
         if (contains(mouseX, mouseY)) {
-            if (onClickAction != null) {
-                onClickAction.accept(this);
-            }
-            for (UIComponent child : children) {
+            if (onClickAction != null) onClickAction.accept(this);
+
+            for (UIComponent child : children)
                 child.mouseClicked(mouseX - x, mouseY - y, 0);
-            }
         }
     }
 
-    public void setPosition(float x, float y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public void setSize(float width, float height) {
-        this.width = width;
-        this.height = height;
-    }
-
-    public void setBounds(float x, float y, float width, float height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-    }
-
-    public boolean hasBackground() { return hasBackground; }
-
-    public boolean hasOutline() { return hasOutline; }
-
-    public boolean hasBlur() { return hasBlur; }
-
-    public List<UIComponent> getChildren() { return new ArrayList<>(children); }
-
+    /**
+     * Called by Minecraft’s GUI system when a mouse button is pressed.
+     * Handles internal click logic and propagates the event to children.
+     *
+     * @param mouseX The mouse X position.
+     * @param mouseY The mouse Y position.
+     * @param button The mouse button index.
+     *
+     * @return Always returns {@code false} to allow event propagation.
+     */
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (contains(mouseX, mouseY)) {
-            for (UIComponent child : children) {
-                child.mouseClicked(mouseX - x, mouseY - y, 0);
-            }
-            return true;
-        }
-        return false;
+    public boolean mouseClicked(double mouseX, double mouseY, int button)
+    {
+        if (!visible || !contains(mouseX, mouseY)) return false;
+
+        if (onClickAction != null) onClickAction.accept(this);
+
+        children.forEach(child -> child.mouseClicked(mouseX - x, mouseY - y, button)); return false;
     }
 }

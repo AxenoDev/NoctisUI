@@ -5,22 +5,36 @@ import fr.libnaus.noctisui.client.api.system.Render2DEngine;
 import fr.libnaus.noctisui.client.api.system.render.font.FontAtlas;
 import fr.libnaus.noctisui.client.api.system.render.font.Fonts;
 import fr.libnaus.noctisui.client.common.QuickImports;
+import fr.libnaus.noctisui.client.utils.Color;
 import lombok.Getter;
 import lombok.Setter;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class NotificationManager implements QuickImports {
+/**
+ * A manager for displaying and handling notifications in the UI.
+ *
+ * <p>This class allows you to create, display, and manage notifications with different types, durations, and styles.</p>
+ *
+ * <pre>
+ *     {@code
+ *     NotificationManager notificationManager = new NotificationManager();
+ *     notificationManager.success("save_success", "Success", "Your changes have been saved.");
+ *     notificationManager.error("save_error", "Error", "Failed to save changes.");
+ *     }
+ * </pre>
+ *
+ * @author axeno
+ *
+ */
+public class NotificationManager implements QuickImports
+{
 
-    @Getter
-    private static NotificationManager instance;
-    private final List<Notification> notifications = new CopyOnWriteArrayList<>();
     private static final int NOTIFICATION_WIDTH = 220;
     private static final int NOTIFICATION_MIN_HEIGHT = 40;
     private static final int NOTIFICATION_MAX_HEIGHT = 80;
@@ -28,27 +42,81 @@ public class NotificationManager implements QuickImports {
     private static final int NOTIFICATION_SPACING = 6;
     private static final int MARGIN_X = 12;
     private static final int MARGIN_Y = 12;
-    @Setter @Getter private static FontAtlas font;
-    @Setter @Getter private static FontAtlas fontBold;
+    @Getter
+    private static NotificationManager instance;
+    @Setter
+    @Getter
+    private static FontAtlas font;
+    @Setter
+    @Getter
+    private static FontAtlas fontBold;
+    private final List<Notification> notifications = new CopyOnWriteArrayList<>();
 
-    public NotificationManager() {
+    /**
+     * Creates a new NotificationManager instance and sets it as the singleton instance.
+     */
+    public NotificationManager()
+    {
         instance = this;
     }
 
-    public static void initFont(Fonts fonts) {
+    /**
+     * Initializes the fonts used for rendering notifications.
+     *
+     * @param fonts The Fonts instance containing the desired fonts.
+     */
+    public static void initFont(Fonts fonts)
+    {
         font = fonts.getInterMedium();
         fontBold = fonts.getInterBold();
     }
 
-    public static void init() {
+    /**
+     * Registers the notification rendering callback to the HUD render event.
+     * This method should be called once during the client initialization.
+     */
+    public static void init()
+    {
         HudRenderCallback.EVENT.register(NotificationManager::renderNotifications);
     }
 
-    public void addNotification(String id, String title, String message, NotificationType type) {
+    /**
+     * Renders the notifications on the HUD.
+     *
+     * @param ctx       The DrawContext for rendering.
+     * @param tickDelta The tick delta for smooth animations.
+     */
+    private static void renderNotifications(DrawContext ctx, float tickDelta)
+    {
+        NotificationManager manager = getInstance();
+        manager.update();
+        manager.render(ctx.getMatrices());
+    }
+
+    /**
+     * Adds a new notification to be displayed.
+     *
+     * @param id      A unique identifier for the notification.
+     * @param title   The title of the notification.
+     * @param message The message content of the notification.
+     * @param type    The type of the notification (e.g., INFO, WARNING, ERROR).
+     */
+    public void addNotification(String id, String title, String message, NotificationType type)
+    {
         addNotification(id, title, message, type, 3000);
     }
 
-    public void addNotification(String id, String title, String message, NotificationType type, long duration) {
+    /**
+     * Adds a new notification to be displayed with a custom duration.
+     *
+     * @param id       A unique identifier for the notification.
+     * @param title    The title of the notification.
+     * @param message  The message content of the notification.
+     * @param type     The type of the notification (e.g., INFO, WARNING, ERROR).
+     * @param duration The duration (in milliseconds) for which the notification should be displayed.
+     */
+    public void addNotification(String id, String title, String message, NotificationType type, long duration)
+    {
         Notification newNotification = new Notification(id, title, message, type, duration);
 
         for (Notification existing : notifications) {
@@ -61,38 +129,66 @@ public class NotificationManager implements QuickImports {
         notifications.add(newNotification);
     }
 
-    public void success(String id, String title, String message) {
+    /**
+     * Adds a success notification.
+     *
+     * @param id      A unique identifier for the notification.
+     * @param title   The title of the notification.
+     * @param message The message content of the notification.
+     */
+    public void success(String id, String title, String message)
+    {
         addNotification(id, title, message, NotificationType.SUCCESS);
     }
 
-    public void error(String id, String title, String message) {
+    /**
+     * Adds an error notification.
+     *
+     * @param id      A unique identifier for the notification.
+     * @param title   The title of the notification.
+     * @param message The message content of the notification.
+     */
+    public void error(String id, String title, String message)
+    {
         addNotification(id, title, message, NotificationType.ERROR);
     }
 
-    public void warning(String id, String title, String message) {
+    /**
+     * Adds a warning notification.
+     *
+     * @param id      A unique identifier for the notification.
+     * @param title   The title of the notification.
+     * @param message The message content of the notification.
+     */
+    public void warning(String id, String title, String message)
+    {
         addNotification(id, title, message, NotificationType.WARNING);
     }
 
-    public void info(String id, String title, String message) {
+    /**
+     * Adds an info notification.
+     *
+     * @param id      A unique identifier for the notification.
+     * @param title   The title of the notification.
+     * @param message The message content of the notification.
+     */
+    public void info(String id, String title, String message)
+    {
         addNotification(id, title, message, NotificationType.INFO);
     }
 
-    private static void renderNotifications(DrawContext ctx, float tickDelta) {
-        NotificationManager manager = getInstance();
-        manager.update();
-        manager.render(ctx.getMatrices());
-    }
-
-    private void update() {
+    /**
+     * Updates the state of all notifications, including their positions and removal status.
+     */
+    private void update()
+    {
         List<Notification> toRemove = new ArrayList<>();
         List<Notification> visibleNotif = new ArrayList<>();
 
         for (Notification notification : notifications) {
             notification.update();
-            if (notification.shouldRemove())
-                toRemove.add(notification);
-            else
-                visibleNotif.add(notification);
+            if (notification.shouldRemove()) toRemove.add(notification);
+            else visibleNotif.add(notification);
         }
 
         notifications.removeAll(toRemove);
@@ -104,7 +200,13 @@ public class NotificationManager implements QuickImports {
         }
     }
 
-    private void render(MatrixStack matrices) {
+    /**
+     * Renders all active notifications on the screen.
+     *
+     * @param matrices The MatrixStack used for rendering transformations.
+     */
+    private void render(MatrixStack matrices)
+    {
         if (notifications.isEmpty()) return;
         int screenWidth = mc.getWindow().getScaledWidth();
 
@@ -120,7 +222,17 @@ public class NotificationManager implements QuickImports {
         }
     }
 
-    private void renderNotification(MatrixStack matrices, Notification notification, int x, int y, float alpha) {
+    /**
+     * Renders a single notification at the specified position with the given alpha transparency.
+     *
+     * @param matrices     The MatrixStack used for rendering transformations.
+     * @param notification The Notification to be rendered.
+     * @param x            The X-coordinate for rendering the notification.
+     * @param y            The Y-coordinate for rendering the notification.
+     * @param alpha        The alpha transparency value (0.0 to 1.0) for the notification.
+     */
+    private void renderNotification(MatrixStack matrices, Notification notification, int x, int y, float alpha)
+    {
         alpha = Math.max(0f, Math.min(1f, alpha));
 
         int notificationHeight = calculateNotificationHeight(notification);
@@ -131,22 +243,12 @@ public class NotificationManager implements QuickImports {
         Color borderColor = new Color(52, 58, 64, (int) (180 * alpha));
         Render2DEngine.drawRoundedOutline(matrices, x, y, NOTIFICATION_WIDTH, notificationHeight, 8, 1.2f, borderColor);
 
-        Color accentColor = new Color(
-                notification.getColor().getRed(),
-                notification.getColor().getGreen(),
-                notification.getColor().getBlue(),
-                (int) (255 * alpha)
-        );
+        Color accentColor = new Color(notification.getColor().getRed(), notification.getColor().getGreen(), notification.getColor().getBlue(), (int) (255 * alpha));
 
         Render2DEngine.drawRoundedRect(matrices, x + 4, y + 6, 3, notificationHeight - 12, 1, accentColor);
 
-        Color iconBgColor = new Color(
-                notification.getColor().getRed(),
-                notification.getColor().getGreen(),
-                notification.getColor().getBlue(),
-                (int) (25 * alpha)
-        );
-        Render2DEngine.drawRoundedRect(matrices, x + 13, y + 10 + (notificationHeight - 20) / 2 - 10, 20, 20, 6, iconBgColor);
+        Color iconBgColor = new Color(notification.getColor().getRed(), notification.getColor().getGreen(), notification.getColor().getBlue(), (int) (25 * alpha));
+        Render2DEngine.drawRoundedRect(matrices, x + 13, y + 10 + (float) (notificationHeight - 20) / 2 - 10, 20, 20, 6, iconBgColor);
 
         renderIcon(matrices, notification.getType(), x + 23, y + 10 + (notificationHeight - 20) / 2, accentColor);
 
@@ -165,13 +267,20 @@ public class NotificationManager implements QuickImports {
             renderWrappedText(matrices, notification.getMessage(), textStartX, currentTextY, maxTextWidth, messageColor, false);
         }
 
-        if (notification.hasStack())
-            renderStackCounter(matrices, notification, x, y, alpha);
+        if (notification.hasStack()) renderStackCounter(matrices, notification, x, y, alpha);
 
         renderProgressBar(matrices, notification, x, y + notificationHeight - 4, alpha);
     }
 
-    private int calculateNotificationHeight(Notification notification) {
+    /**
+     * Calculates the height of a notification based on its content.
+     *
+     * @param notification The Notification for which to calculate the height.
+     *
+     * @return The calculated height of the notification.
+     */
+    private int calculateNotificationHeight(Notification notification)
+    {
         int height = NOTIFICATION_MIN_HEIGHT;
         int maxTextWidth = NOTIFICATION_WIDTH - 38 - 8; // 38 = position du texte, 8 = marge droite
 
@@ -188,7 +297,17 @@ public class NotificationManager implements QuickImports {
         return Math.min(height, NOTIFICATION_MAX_HEIGHT);
     }
 
-    private List<String> wrapText(String text, int maxWidth, boolean bold) {
+    /**
+     * Wraps the given text into multiple lines based on the specified maximum width.
+     *
+     * @param text     The text to be wrapped.
+     * @param maxWidth The maximum width (in pixels) for each line.
+     * @param bold     Whether to use the bold font for width calculations.
+     *
+     * @return A list of strings, each representing a line of wrapped text.
+     */
+    private List<String> wrapText(String text, int maxWidth, boolean bold)
+    {
         FontAtlas police = bold ? fontBold : font;
         List<String> lines = new ArrayList<>();
 
@@ -196,29 +315,46 @@ public class NotificationManager implements QuickImports {
         StringBuilder currentLine = new StringBuilder();
 
         for (String word : words) {
-            String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
+            String testLine = currentLine.isEmpty() ? word : currentLine + " " + word;
 
             if (police.getWidth(testLine) <= maxWidth) {
                 currentLine = new StringBuilder(testLine);
-            } else {
-                if (currentLine.length() > 0) {
+            }
+            else {
+                if (!currentLine.isEmpty()) {
                     lines.add(currentLine.toString());
                     currentLine = new StringBuilder(word);
-                } else {
+                }
+                else {
                     // Si même un mot seul dépasse, on le tronque
                     lines.add(truncateText(word, maxWidth, bold));
                 }
             }
         }
 
-        if (currentLine.length() > 0) {
+        if (!currentLine.isEmpty()) {
             lines.add(currentLine.toString());
         }
 
         return lines;
     }
 
-    private int renderWrappedText(MatrixStack matrices, String text, int x, int y, int maxWidth, Color color, boolean bold) {
+    /**
+     * Renders wrapped text at the specified position, handling line breaks as needed.
+     *
+     * @param matrices The MatrixStack used for rendering transformations.
+     * @param text     The text to be rendered.
+     * @param x        The X-coordinate for rendering the text.
+     * @param y        The starting Y-coordinate for rendering the text.
+     * @param maxWidth The maximum width (in pixels) for each line of text.
+     * @param color    The color of the text.
+     * @param bold     Whether to use the bold font for rendering.
+     *
+     * @return The Y-coordinate after rendering the text (useful for further rendering).
+     */
+    private int renderWrappedText(MatrixStack matrices, String text, int x, int y, int maxWidth, Color color,
+                                  boolean bold)
+    {
         List<String> lines = wrapText(text, maxWidth, bold);
         int currentY = y;
 
@@ -230,7 +366,17 @@ public class NotificationManager implements QuickImports {
         return currentY;
     }
 
-    private void renderStackCounter(MatrixStack matrices, Notification notification, int x, int y, float alpha) {
+    /**
+     * Renders the stack counter for a notification if it has multiple stacked instances.
+     *
+     * @param matrices     The MatrixStack used for rendering transformations.
+     * @param notification The Notification for which to render the stack counter.
+     * @param x            The X-coordinate for rendering the stack counter.
+     * @param y            The Y-coordinate for rendering the stack counter.
+     * @param alpha        The alpha transparency value (0.0 to 1.0) for the stack counter.
+     */
+    private void renderStackCounter(MatrixStack matrices, Notification notification, int x, int y, float alpha)
+    {
         String stackText = "x" + notification.getStackCount();
 
         int textWidth = (int) font.getWidth(stackText);
@@ -246,12 +392,32 @@ public class NotificationManager implements QuickImports {
         drawText(matrices, stackText, textX, textY, 8, stackTextColor, true);
     }
 
-    private void renderIcon(MatrixStack matrices, NotificationType type, int x, int y, Color color) {
+    /**
+     * Renders the icon for a notification type at the specified position.
+     *
+     * @param matrices The MatrixStack used for rendering transformations.
+     * @param type     The NotificationType whose icon is to be rendered.
+     * @param x        The X-coordinate for rendering the icon.
+     * @param y        The Y-coordinate for rendering the icon.
+     * @param color    The color to apply to the icon.
+     */
+    private void renderIcon(MatrixStack matrices, NotificationType type, int x, int y, Color color)
+    {
         FontAtlas lucide = NoctisUIClient.getInstance().getFonts().getLucide();
         lucide.render(matrices, type.getIcon(), x - 5, y - 5, 10, color.getRGB());
     }
 
-    private void renderProgressBar(MatrixStack matrices, Notification notification, int x, int y, float alpha) {
+    /**
+     * Renders the progress bar for a notification at the specified position.
+     *
+     * @param matrices     The MatrixStack used for rendering transformations.
+     * @param notification The Notification for which to render the progress bar.
+     * @param x            The X-coordinate for rendering the progress bar.
+     * @param y            The Y-coordinate for rendering the progress bar.
+     * @param alpha        The alpha transparency value (0.0 to 1.0) for the progress bar.
+     */
+    private void renderProgressBar(MatrixStack matrices, Notification notification, int x, int y, float alpha)
+    {
         long elapsed = System.currentTimeMillis() - notification.getLastStackTime();
         float progress = Math.min(elapsed / (float) notification.getDuration(), 1f);
 
@@ -260,33 +426,57 @@ public class NotificationManager implements QuickImports {
 
         if (progress < 1f) {
             int barWidth = (int) ((NOTIFICATION_WIDTH - 8) * (1f - progress));
-            Color progressColor = new Color(
-                    notification.getColor().getRed(),
-                    notification.getColor().getGreen(),
-                    notification.getColor().getBlue(),
-                    (int) (200 * alpha)
-            );
+            Color progressColor = new Color(notification.getColor().getRed(), notification.getColor().getGreen(), notification.getColor().getBlue(), (int) (200 * alpha));
             Render2DEngine.drawRoundedRect(matrices, x + 4, y, barWidth, 3, 1, progressColor);
         }
     }
 
-    private void drawText(MatrixStack matrices, String text, int x, int y, Color color, boolean bold) {
-        FontAtlas police = bold
-                ? fontBold
-                : font;
+    /**
+     * Draws text at the specified position with the given color and font style.
+     *
+     * @param matrices The MatrixStack used for rendering transformations.
+     * @param text     The text to be drawn.
+     * @param x        The X-coordinate for rendering the text.
+     * @param y        The Y-coordinate for rendering the text.
+     * @param color    The color of the text.
+     * @param bold     Whether to use the bold font for rendering.
+     */
+    private void drawText(MatrixStack matrices, String text, int x, int y, Color color, boolean bold)
+    {
+        FontAtlas police = bold ? fontBold : font;
 
         police.render(matrices, text, x, y, color.getRGB());
     }
 
-    private void drawText(MatrixStack matrices, String text, int x, int y, float size, Color color, boolean bold) {
-        FontAtlas police = bold
-                ? fontBold
-                : font;
+    /**
+     * Draws text at the specified position with the given size, color, and font style.
+     *
+     * @param matrices The MatrixStack used for rendering transformations.
+     * @param text     The text to be drawn.
+     * @param x        The X-coordinate for rendering the text.
+     * @param y        The Y-coordinate for rendering the text.
+     * @param size     The size of the font.
+     * @param color    The color of the text.
+     * @param bold     Whether to use the bold font for rendering.
+     */
+    private void drawText(MatrixStack matrices, String text, int x, int y, float size, Color color, boolean bold)
+    {
+        FontAtlas police = bold ? fontBold : font;
 
         police.render(matrices, text, x, y, size, color.getRGB());
     }
 
-    private String truncateText(String text, int maxWidth, boolean bold) {
+    /**
+     * Truncates the given text to fit within the specified maximum width, adding an ellipsis if necessary.
+     *
+     * @param text     The text to be truncated.
+     * @param maxWidth The maximum width (in pixels) for the text.
+     * @param bold     Whether to use the bold font for width calculations.
+     *
+     * @return The truncated text with an ellipsis if it exceeds the maximum width.
+     */
+    private String truncateText(String text, int maxWidth, boolean bold)
+    {
         FontAtlas police = bold ? fontBold : font;
 
         if (police.getWidth(text) <= maxWidth) {
@@ -305,6 +495,6 @@ public class NotificationManager implements QuickImports {
             truncated.append(text.charAt(i));
         }
 
-        return truncated.toString() + ellipsis;
+        return truncated + ellipsis;
     }
 }
