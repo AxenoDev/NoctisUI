@@ -12,29 +12,31 @@ import net.minecraft.util.Identifier;
 import java.io.IOException;
 
 @Getter
-public class Fonts implements SimpleSynchronousResourceReloadListener {
+public class Fonts implements SimpleSynchronousResourceReloadListener
+{
 
     private FontAtlas interBold, interSemiBold, interMedium, proggyClean, poppins, icons, lucide;
 
-    public Fonts() {
+    public Fonts()
+    {
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(this);
     }
 
     @Override
-    public Identifier getFabricId() {
+    public Identifier getFabricId()
+    {
         return Identifier.of(NoctisUI.MODID, "reload_fonts");
     }
 
     @Override
-    public void reload(ResourceManager manager) {
+    public void reload(ResourceManager manager)
+    {
         try {
             this.interBold = new FontAtlas(manager, "inter-bold");
             this.interSemiBold = new FontAtlas(manager, "inter-semibold");
             this.interMedium = new FontAtlas(manager, "inter-medium");
-            this.proggyClean = new FontAtlas(manager, "proggy-clean");
-            this.poppins = new FontAtlas(manager, "poppins");
-            this.icons = new FontAtlas(manager, "icons");
-            this.lucide = new FontAtlas(manager, "lucide");
+            this.proggyClean = new FontAtlas(manager, "proggy-clean"); this.poppins = new FontAtlas(manager, "poppins");
+            this.icons = new FontAtlas(manager, "icons"); this.lucide = new FontAtlas(manager, "lucide");
 
             NotificationManager.initFont(this);
         } catch (final IOException e) {

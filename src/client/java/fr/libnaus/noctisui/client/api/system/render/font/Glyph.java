@@ -4,7 +4,8 @@ import com.google.gson.JsonObject;
 import lombok.Getter;
 
 @Getter
-public class Glyph {
+public class Glyph
+{
 
     private int unicode;
     private float advance;
@@ -12,11 +13,11 @@ public class Glyph {
     private float planeLeft, planeBottom, planeRight, planeTop;
     private float atlasLeft, atlasBottom, atlasRight, atlasTop;
 
-    public static Glyph parse(final JsonObject object) {
+    public static Glyph parse(final JsonObject object)
+    {
         final Glyph glyph = new Glyph();
 
-        glyph.unicode = object.get("unicode").getAsInt();
-        glyph.advance = object.get("advance").getAsFloat();
+        glyph.unicode = object.get("unicode").getAsInt(); glyph.advance = object.get("advance").getAsFloat();
 
         if (object.has("planeBounds")) {
             glyph.planeLeft = object.get("planeBounds").getAsJsonObject().get("left").getAsFloat();
