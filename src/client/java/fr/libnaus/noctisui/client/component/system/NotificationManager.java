@@ -248,7 +248,7 @@ public class NotificationManager
         Render2DEngine.drawRoundedRect(matrices, x + 4, y + 6, 3, notificationHeight - 12, 1, accentColor);
 
         Color iconBgColor = new Color(notification.getColor().getRed(), notification.getColor().getGreen(), notification.getColor().getBlue(), (int) (25 * alpha));
-        Render2DEngine.drawRoundedRect(matrices, x + 13, y + 10 + (float) (notificationHeight - 20) / 2 - 10, 20, 20, 6, iconBgColor);
+        Render2DEngine.drawRoundedRect(matrices, x + 13, y + 10 + (notificationHeight - 20) / 2f - 10, 20, 20, 6, iconBgColor);
 
         renderIcon(matrices, notification.getType(), x + 23, y + 10 + (notificationHeight - 20) / 2, accentColor);
 
