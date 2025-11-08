@@ -115,7 +115,8 @@ public class Notification implements QuickImports
      */
     public boolean shouldRemove()
     {
-        long elapsed = System.currentTimeMillis() - lastStackTime; return elapsed > duration;
+        long elapsed = System.currentTimeMillis() - lastStackTime;
+        return elapsed > duration;
     }
 
     /**
