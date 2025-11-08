@@ -105,8 +105,15 @@ publishing {
             groupId = project.maven_group
             artifactId = project.archives_base_name
             version = project.version
-            
-            from components.java
+
+            artifact(tasks.named("remapJar")) {
+                builtBy(tasks.named("remapJar"))
+            }
+
+            artifact(tasks.named("sourcesJar")) {
+                classifier = "sources"
+                builtBy tasks.named("sourcesJar")
+            }
             
             pom {
                 name = 'NoctisUI'
