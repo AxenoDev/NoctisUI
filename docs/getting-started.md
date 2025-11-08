@@ -21,19 +21,29 @@ NoctisUI is a powerful UI library for Minecraft (Fabric) that provides developer
 
 ```gradle
 repositories {
-    // Add the repository where NoctisUI is published
     maven {
-        url = "https://your-maven-repo-url"
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/AxenoDev/NoctisUI")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
+        }
     }
 }
 
 dependencies {
     // Add NoctisUI as a dependency
-    modImplementation "fr.libnaus:noctisui:1.0.0"
+    modImplementation "fr.libnaus:noctisui:${project.noctisui_version}"
 }
 ```
 
-2. Add NoctisUI to your `fabric.mod.json` dependencies:
+2. Add the version property to your `gradle.properties`:
+
+```properties
+noctisui_version=1.0.0
+```
+
+3. Add NoctisUI to your `fabric.mod.json` dependencies:
 
 ```json
 {
@@ -42,6 +52,18 @@ dependencies {
   }
 }
 ```
+
+::: tip Authentication for GitHub Packages
+To access GitHub Packages, you need to provide credentials. You can:
+- Add them to your `~/.gradle/gradle.properties`:
+  ```properties
+  gpr.user=YOUR_GITHUB_USERNAME
+  gpr.token=YOUR_GITHUB_TOKEN
+  ```
+- Or set environment variables `GITHUB_ACTOR` and `GITHUB_TOKEN`
+
+You can generate a personal access token at [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens) with `read:packages` permission.
+:::
 
 ### For Players
 
