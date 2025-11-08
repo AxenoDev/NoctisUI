@@ -102,12 +102,63 @@ jar {
 publishing {
     publications {
         create("mavenJava", MavenPublication) {
+            groupId = project.maven_group
             artifactId = project.archives_base_name
-            from components.java
+            version = project.version
+
+            artifact(tasks.named("jar")) {
+                classifier = "dev"
+                builtBy tasks.named("jar")
+            }
+
+            artifact(tasks.named("sourcesJar")) {
+                classifier = "sources"
+                builtBy tasks.named("sourcesJar")
+            }
+            
+            pom {
+                name = 'NoctisUI'
+                description = 'A Minecraft UI library for creating custom and interactive user interfaces'
+                url = 'https://github.com/AxenoDev/NoctisUI'
+                
+                licenses {
+                    license {
+                        name = 'GNU General Public License v3.0'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.html'
+                    }
+                }
+                
+                developers {
+                    developer {
+                        id = 'AxenoDev'
+                        name = 'Timéo B.'
+                        email = 'tbavart@gmail.com'
+                    }
+                }
+                
+                scm {
+                    connection = 'scm:git:git://github.com/AxenoDev/NoctisUI.git'
+                    developerConnection = 'scm:git:ssh://github.com:AxenoDev/NoctisUI.git'
+                    url = 'https://github.com/AxenoDev/NoctisUI'
+                }
+            }
         }
     }
 
-    repositories {}
+    repositories {
+        // GitHub Packages repository
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/AxenoDev/NoctisUI")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+        
+        // Local Maven repository for testing
+        mavenLocal()
+    }
 }
 
 tasks.jar {
