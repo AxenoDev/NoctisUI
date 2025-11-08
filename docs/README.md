@@ -40,7 +40,7 @@ npm install
 npm run docs:dev
 ```
 
-3. Open http://localhost:5173 in your browser
+The documentation will be available at your local server (usually port 5173).
 
 ### Build
 
