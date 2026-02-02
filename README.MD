@@ -43,8 +43,6 @@ dependencies {
 }
 ```
 
-Pour plus de détails sur l'installation et la configuration, consultez [MAVEN_PUBLISHING.md](MAVEN_PUBLISHING.md).
-
 ### Contribution
 1. Forkez le projet
 2. Assurez-vous de bien suivre les [conventions de contribution](CONTRIBUTING.md)
