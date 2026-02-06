@@ -86,7 +86,7 @@ jobs:
           path: builds/
 
       - name: Publish to Modrinth
-        if: steps.check_docs.outputs.is_docs == 'false' && (secrets.MODRINTH_TOKEN != '')
+        if: steps.check_docs.outputs.is_docs == 'false' && env.MODRINTH_TOKEN != ''
         run: |
           chmod +x ./gradlew
           echo "Publishing to Modrinth for tag: $TAG"
