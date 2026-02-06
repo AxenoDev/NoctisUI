@@ -3,52 +3,46 @@
   <img src="https://raw.githubusercontent.com/Libnaus/.github/refs/heads/main/profile/assets/img/NOCTISUI.png" alt="Noctis UI Banner" width="800"><br><br>
 </div>
 
-**NoctisUI** est un mod Minecraft permettant aux développeurs de créer des interfaces utilisateur personnalisées et 
-interactives facilement.
+**NoctisUI** is a Minecraft mod that allows developers to create custom, interactive user interfaces easily.
 
-#### Caractéristiques principales :
-- 🎨 **Création simplifiée** d'interfaces utilisateur
-- 🔧 **Contrôle total** sur l'apparence et les fonctionnalités
-- 🧩 **Intégration facile** dans vos propres mods
-- 🔄 **Mise à jour régulière** et support continu
+#### Key features:
+- 🎨 **Simplified creation** of user interfaces
+- 🔧 **Full control** over appearance and behavior
+- 🧩 **Easy integration** into your own mods
+- 🔄 **Regular updates** and ongoing support
 
-Ce framework puissant vous donne les outils nécessaires pour concevoir des menus, boutons et autres éléments d'interface qui enrichiront l'expérience des joueurs.
+This powerful framework gives you the tools to design menus, buttons and other UI elements that will enhance the player experience.
 
-> **Important :** NoctisUI est encore en **développement**.
-> Il peut donc contenir des **bugs** / des **problèmes de performance**.
-> N'hésitez pas à nous faire part de vos retours, dans les [issues du repo](https://github.com/Libnaus/NoctisUI/issues).
+> **Important:** NoctisUI is still in **development**.
+> It may therefore contain **bugs** / **performance issues**.
+> Feel free to send feedback via the [issues of the repo](https://github.com/AxenoDev/NoctisUI/issues).
 
-### 📦 Utilisation comme dépendance
+### 📦 Use as a dependency
 
-NoctisUI est disponible sur GitHub Packages et peut être utilisé comme dépendance dans vos mods Fabric.
+NoctisUI is available via JitPack and can be used as a dependency in your Fabric mods.
 
-#### Installation rapide
+#### Quick installation
 
-Ajoutez à votre `build.gradle`:
+Add to your `build.gradle`:
 
 ```gradle
 repositories {
     maven {
-        name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/AxenoDev/NoctisUI")
-        credentials {
-            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
-            password = project.findProperty("gpr.token") ?: System.getenv("GITHUB_TOKEN")
-        }
+        url = uri("https://jitpack.io")
     }
 }
 
 dependencies {
-    modImplementation "fr.libnaus:noctisui:1.0.0"
+    modImplementation "com.github.AxenoDev:NoctisUI:VERSION"
 }
 ```
 
 ### Contribution
-1. Forkez le projet
-2. Assurez-vous de bien suivre les [conventions de contribution](CONTRIBUTING.md)
-3. Créez une branche pour vos modifications
-4. Une fois terminé, ouvrez une **Pull Request** avec une description claire de vos changements
-5. Après revue, vos modifications seront fusionnées dans le projet principal
+1. Fork the project
+2. Make sure to follow the [contribution guidelines](CONTRIBUTING.md)
+3. Create a branch for your changes
+4. When finished, open a **Pull Request** with a clear description of your changes
+5. After review, your changes will be merged into the main project
 
 ### 📃 LICENSE
-Projet sous [GNU GENERAL PUBLIC LICENSE](LICENSE)
+Project licensed under the [GNU GENERAL PUBLIC LICENSE](LICENSE)
