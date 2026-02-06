@@ -152,6 +152,19 @@ modrinth {
     syncBodyFrom = writeModrinthBodyFile(modrinthBody).absolutePath
 }
 
+tasks.register('printModrinthBody') {
+    group = 'help'
+    description = 'Print the Modrinth description body chosen for this version (fetches GitHub release body or falls back to README.md) and show the file path'
+    doLast {
+        def body = fetchReleaseDescription(tag)
+        def outFile = writeModrinthBodyFile(body)
+        println "Modrinth description written to: ${outFile.absolutePath}"
+        println '---- Modrinth description start ----'
+        println body
+        println '---- Modrinth description end ----'
+    }
+}
+
 publishing {
     publications {
         create("maven", MavenPublication) {
