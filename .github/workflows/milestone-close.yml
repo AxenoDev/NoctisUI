@@ -85,6 +85,17 @@ jobs:
           name: noctisui-${{ github.event.milestone.title }}.jar
           path: builds/
 
+      - name: Publish to Modrinth
+        if: steps.check_docs.outputs.is_docs == 'false' && (secrets.MODRINTH_TOKEN != '')
+        run: |
+          chmod +x ./gradlew
+          echo "Publishing to Modrinth for tag: $TAG"
+          # Run the Gradle Modrinth publish task provided by the com.modrinth.minotaur plugin
+          ./gradlew --no-daemon modrinth
+        env:
+          TAG: ${{ github.event.milestone.title }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+
       - name: Create GitHub Release
         if: steps.check_docs.outputs.is_docs == 'false'
         uses: softprops/action-gh-release@v2
