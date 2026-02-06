@@ -1,18 +1,22 @@
 changelog:
   categories:
-    - title: "Nouvelles fonctionnalités"
+    - title: "New Features"
       labels:
         - "📦 Features"
         - "➕ Ajout"
-    - title: "Améliorations & Corrections"
+    - title: "Updates & Changes"
       labels:
         - "🆙 Amélioration"
         - "🔧️ Changement"
-    - title: "Bugs & Optimisations"
+    - title: "Bugs & Fixes"
       labels:
         - "🪲 Bug Report"
         - "✨ Fixes"
         - "⚡ Optimisation"
-    - title: "Autres"
+    - title: "Documentation"
+      labels:
+        - "📚 Documentation"
+        - "📝 Docs"
+    - title: "Other"
       labels:
         - "*"

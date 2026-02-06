@@ -95,9 +95,9 @@ jobs:
           fail_on_unmatched_files: true
           make_latest: true
           body: |
-            # Mise à jour de NoctisUI ${{ github.event.milestone.title }}
+            # Update of NoctisUI ${{ github.event.milestone.title }}
             
-            ## Changements
+            ## Description
             ${{ github.event.milestone.description }}
           files: |
             build/devlibs/noctisui-*-dev.jar 
