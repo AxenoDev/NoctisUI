@@ -98,40 +98,62 @@ jar {
     }
 }
 
+def writeModrinthBodyFile = { String text ->
+    def outFile = file("${buildDir}/modrinth-description.md")
+    outFile.parentFile.mkdirs()
+    outFile.text = text
+    return outFile
+}
+
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN")
+    projectId = "noctisui"
+    versionNumber = version
+    versionName = "NoctisUI ${version}"
+    uploadFile = remapJar
+    gameVersions = ["${minecraft_version}"]
+    loaders = ["fabric"]
+
+    def modrinthBody = fetchReleaseDescription(tag)
+    syncBodyFrom = writeModrinthBodyFile(modrinthBody)
+}
+
+tasks.register('printModrinthBody') {
+    group = 'help'
+    description = 'Print the Modrinth description body chosen for this version (fetches GitHub release body or falls back to README.md) and show the file path'
+    doLast {
+        def body = fetchReleaseDescription(tag)
+        def outFile = writeModrinthBodyFile(body)
+        println "Modrinth description written to: ${outFile.absolutePath}"
+        println '---- Modrinth description start ----'
+        println body
+        println '---- Modrinth description end ----'
+    }
+}
+
 publishing {
     publications {
-        create("mavenJava", MavenPublication) {
-            groupId = project.maven_group
-            artifactId = project.archives_base_name
-            version = project.version
-
-            artifact(tasks.named("jar")) {
-                classifier = "dev"
-                builtBy tasks.named("jar")
-            }
-
-            artifact(tasks.named("sourcesJar")) {
-                classifier = "sources"
-                builtBy tasks.named("sourcesJar")
-            }
+        create("maven", MavenPublication) {
+            from components.java
+            artifactId = 'noctisui'
 
             pom {
                 name = 'NoctisUI'
-                description = 'A Minecraft UI library for creating custom and interactive user interfaces'
+                description = 'NoctisUI is a Minecraft UI library that makes it easy to create menus and HUDs.'
                 url = 'https://github.com/AxenoDev/NoctisUI'
 
                 licenses {
                     license {
                         name = 'GNU General Public License v3.0'
-                        url = 'https://www.gnu.org/licenses/gpl-3.0.html'
+                        url = 'https://opensource.org/licenses/GPL-3.0'
                     }
                 }
 
                 developers {
                     developer {
                         id = 'AxenoDev'
-                        name = 'Timéo B.'
-                        email = 'tbavart@gmail.com'
+                        name = 'AxenoDev'
+                        url = 'https://axeno.me'
                     }
                 }
 
@@ -143,18 +165,15 @@ publishing {
             }
         }
     }
-
     repositories {
         maven {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/AxenoDev/NoctisUI")
             credentials {
-                username = System.getenv("GITHUB_USERNAME")
+                username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
-
-        mavenLocal()
     }
 }
 
