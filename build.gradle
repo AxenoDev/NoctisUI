@@ -129,7 +129,7 @@ def fetchReleaseDescription = { String releaseTag ->
     } catch (Exception e) {
         logger.lifecycle("modrinth: failed to fetch release description (${e.message}), falling back to README.md")
     }
-    return file("README.md").text
+    return file("README.MD").text
 }
 
 def writeModrinthBodyFile = { String text ->
