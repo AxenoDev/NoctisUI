@@ -99,6 +99,39 @@ jar {
     }
 }
 
+def fetchReleaseDescription = { String releaseTag ->
+    try {
+        if (!releaseTag || releaseTag == 'unknown' || releaseTag.startsWith('dev-')) {
+            logger.lifecycle("modrinth: release tag is '${releaseTag}', falling back to README.md")
+            return file("README.md").text
+        }
+
+        def repo = 'AxenoDev/NoctisUI'
+        def apiUrl = "https://api.github.com/repos/${repo}/releases/tags/${releaseTag}"
+        def connection = new URL(apiUrl).openConnection()
+        def ghToken = System.getenv('GITHUB_TOKEN')
+        if (ghToken) {
+            connection.setRequestProperty('Authorization', "token ${ghToken}")
+        }
+        connection.setRequestProperty('Accept', 'application/vnd.github.v3+json')
+        connection.connect()
+
+        if (connection.responseCode == 200) {
+            def text = connection.inputStream.text
+            def json = new groovy.json.JsonSlurper().parseText(text)
+            if (json.body) {
+                logger.lifecycle("modrinth: using GitHub release description for tag ${releaseTag}")
+                return json.body.toString()
+            }
+        } else {
+            logger.lifecycle("modrinth: no GitHub release found for tag ${releaseTag} (HTTP ${connection.responseCode}), falling back to README.md")
+        }
+    } catch (Exception e) {
+        logger.lifecycle("modrinth: failed to fetch release description (${e.message}), falling back to README.md")
+    }
+    return file("README.md").text
+}
+
 def writeModrinthBodyFile = { String text ->
     def outFile = file("${buildDir}/modrinth-description.md")
     outFile.parentFile.mkdirs()
@@ -116,7 +149,7 @@ modrinth {
     loaders = ["fabric"]
 
     def modrinthBody = fetchReleaseDescription(tag)
-    syncBodyFrom = writeModrinthBodyFile(modrinthBody)
+    syncBodyFrom = writeModrinthBodyFile(modrinthBody).absolutePath
 }
 
 tasks.register('printModrinthBody') {
