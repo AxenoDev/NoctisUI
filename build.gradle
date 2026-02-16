@@ -139,6 +139,22 @@ def writeModrinthBodyFile = { String text ->
     return outFile
 }
 
+def determineModrinthVersionType = { String releaseTag ->
+    if (!releaseTag) return 'alpha'
+    def tagLower = releaseTag.toLowerCase()
+    if (tagLower.contains('snapshot') || tagLower.contains('dev') || tagLower.contains('alpha') || tagLower.matches(/v?\d+\.\d+(-?a|alpha).*/)) {
+        return 'alpha'
+    }
+    if (tagLower.contains('beta') || tagLower.matches(/v?\d+\.\d+(-?b|beta).*/)) {
+        return 'beta'
+    }
+    if (tagLower.contains('rc') || tagLower.matches(/v?\d+\.\d+(-?rc).*/)) {
+        return 'beta'
+    }
+
+    return 'release'
+}
+
 modrinth {
     token = System.getenv("MODRINTH_TOKEN")
     projectId = "noctisui"
@@ -149,7 +165,10 @@ modrinth {
     loaders = ["fabric"]
 
     def modrinthBody = fetchReleaseDescription(tag)
-    syncBodyFrom = writeModrinthBodyFile(modrinthBody).absolutePath
+    syncBodyFrom = writeModrinthBodyFile(modrinthBody)
+
+    versionType = determineModrinthVersionType(tag)
+    logger.lifecycle("modrinth: determined versionType=${versionType} for tag=${tag}")
 }
 
 tasks.register('printModrinthBody') {
